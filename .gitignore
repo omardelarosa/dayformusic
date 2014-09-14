@@ -1,5 +1,5 @@
 node_modules/
-public/app.min.js
-public/app.min.js.map
-public/styles.css
+public/bundle.min.js
+public/bundle.min.js.map
+public/style.css
 public/template.js

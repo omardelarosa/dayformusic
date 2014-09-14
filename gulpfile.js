@@ -1,28 +1,29 @@
-var browserify  = require('browserify');
-var gulp        = require('gulp');
-var source      = require('vinyl-source-stream');
-var buffer      = require('vinyl-buffer');
-var uglify      = require('gulp-uglify');
-var sourcemaps  = require('gulp-sourcemaps');
-var exec        = require('child_process').exec;
-var jade        = require('gulp-jade');
+var browserify    = require('browserify');
+var gulp          = require('gulp');
+var source        = require('vinyl-source-stream');
+var buffer        = require('vinyl-buffer');
+var uglify        = require('gulp-uglify');
+var sourcemaps    = require('gulp-sourcemaps');
+var exec          = require('child_process').exec;
+var jade          = require('retro-gulp-jade');
+var wrapCommonjs  = require('gulp-wrap-commonjs');
+var plumber       = require('gulp-plumber');
+var sass          = require('gulp-sass');
+var concat        = require('gulp-concat')
 
 'use strict';
 
-gulp.task('default', function() {
-  console.log("no op");
-});
+gulp.task('default', [ 'watch' ]);
 
 var getBundleName = function () {
-  var version = require('./package.json').version;
-  var name = "app";
+  var name = "bundle";
   return name + '.' + 'min';
 };
 
 gulp.task('js', function() {
 
   var bundler = browserify({
-    entries: [ './src/index.js' ],
+    entries: [ './src/js/index.js' ],
     debug: true
   });
 
@@ -41,14 +42,28 @@ gulp.task('js', function() {
   return bundle();
 });
 
-gulp.task('templates', function() {
-  gulp.src('./src/templates/**/*.jade')
+gulp.task('jade', function() {
+  return gulp.src('./src/templates/**/*.jade')
     .pipe(jade({
-      client: true
+      client: true,
+      exports: true
     }))
-    .pipe(gulp.dest('./public/'))
+    .pipe(gulp.dest('./src/templates/'))
 });
 
+gulp.task('sass', function () {
+    gulp.src('src/scss/**/*.scss')
+        .pipe(sass())
+        .pipe(gulp.dest('./src/css'))
+        .pipe(concat('style.css'))
+        .pipe(gulp.dest('./public/'));
+});
+
+
 gulp.task('watch', function() {
-  gulp.watch('./src/**/*.js', [ "js" ])
+
+  gulp.watch([ './src/scss/*.scss' ], [ 'sass' ])
+  gulp.watch([ './src/**/*.js' ], [ 'js' ])
+  gulp.watch([ './src/**/*.jade' ], [ 'jade' ])
+
 })
