@@ -4,12 +4,14 @@ This is boilerplate code for easy, client-side application asset compilation.
 
 ## usage
 
-1. live build
+### watched builds
+
 ```
 gulp watch
 ```
 
-2. build at once
+### build at once
+
 ```
 gulp build
 ```
