@@ -15,6 +15,8 @@ var concat        = require('gulp-concat')
 
 gulp.task('default', [ 'watch' ]);
 
+gulp.task('build', [ 'jade', 'js', 'sass' ] )
+
 var getBundleName = function () {
   var name = "bundle";
   return name + '.' + 'min';
