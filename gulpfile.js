@@ -9,13 +9,15 @@ var jade          = require('retro-gulp-jade');
 var wrapCommonjs  = require('gulp-wrap-commonjs');
 var plumber       = require('gulp-plumber');
 var sass          = require('gulp-sass');
-var concat        = require('gulp-concat')
+var concat        = require('gulp-concat');
+var jshint        = require('gulp-jshint');
+var stylish       = require('jshint-stylish');
 
 'use strict';
 
 gulp.task('default', [ 'watch' ]);
 
-gulp.task('build', [ 'jade', 'js', 'sass' ] )
+gulp.task('build', [ 'jade', 'lint', 'js', 'sass' ] )
 
 var getBundleName = function () {
   var name = "bundle";
@@ -52,6 +54,12 @@ gulp.task('jade', function() {
     }))
     .pipe(gulp.dest('./src/templates/'))
 });
+
+gulp.task('lint', function() {
+  return gulp.src('./src/js/**/*.js')
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish));
+})
 
 gulp.task('sass', function () {
     gulp.src('src/scss/**/*.scss')
