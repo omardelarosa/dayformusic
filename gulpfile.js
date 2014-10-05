@@ -20,6 +20,8 @@ gulp.task('default', [ 'watch' ]);
 
 gulp.task('build', [ 'jade', 'lint', 'js', 'sass' ] )
 
+gulp.task('heroku:production', [ 'build' ])
+
 var getBundleName = function () {
   var name = "bundle";
   return name + '.' + 'min';

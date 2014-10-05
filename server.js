@@ -4,7 +4,8 @@ var express = require('express')
   , mongo = require('mongoskin')
   , moment = require('moment')
   , path = require('path')
-  , db = mongo.db(process.env.MONGOLAB_URI, {native_parser:true});
+  , db = mongo.db(process.env.MONGOLAB_URI, {native_parser:true})
+  , routes = require('./app/config/routes');
 
 module.exports.start = function(done){
 
@@ -19,6 +20,9 @@ module.exports.start = function(done){
 
   app.use(express.static(__dirname + '/public'));
   app.use(logfmt.requestLogger());
+
+  // bind routes
+  routes(app);
 
   var port = Number(process.env.PORT || 5001);
 
