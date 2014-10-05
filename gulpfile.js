@@ -12,6 +12,7 @@ var sass          = require('gulp-sass');
 var concat        = require('gulp-concat');
 var jshint        = require('gulp-jshint');
 var stylish       = require('jshint-stylish');
+var server        = require('./server');
 
 'use strict';
 
@@ -71,6 +72,8 @@ gulp.task('sass', function () {
 
 
 gulp.task('watch', function() {
+
+  server.start()
 
   gulp.watch([ './src/scss/*.scss' ], [ 'sass' ])
   gulp.watch([ './src/**/*.js' ], [ 'js' ])
