@@ -3,3 +3,5 @@ public/bundle.min.js
 public/bundle.min.js.map
 public/style.css
 public/template.js
+tmp/
+.DS_Store

@@ -14,7 +14,7 @@ app.use(bodyParser.json())
 app.use(express.static(__dirname + '/public'));
 app.use(logfmt.requestLogger());
 
-var port = Number(process.env.PORT || 5000);
+var port = Number(process.env.PORT || 5001);
 app.listen(port, function() {
   console.log("Listening on " + port);
 });
