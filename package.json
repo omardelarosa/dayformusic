@@ -9,6 +9,7 @@
   "author": "Omar Delarosa",
   "license": "ISC",
   "dependencies": {
+    "backbone": "^1.1.2",
     "body-parser": "^1.8.1",
     "browserify": "^5.11.2",
     "express": "^4.9.5",
@@ -22,6 +23,7 @@
     "gulp-uglify": "^1.0.1",
     "gulp-wrap-commonjs": "^0.1.11",
     "gzippo": "^0.2.0",
+    "handlebars": "^2.0.0",
     "jade": "^1.6.0",
     "jquery": "^2.1.1",
     "jshint-stylish": "^0.4.0",

@@ -1,16 +1,14 @@
 var $ = require("jquery");
+var jQuery = $;
 var bodyTemplate = require('../templates/body');
+var Router = require("./router");
+var Backbone = require('backbone');
+Backbone.$ = $;
 
-window.onload = function(){
-  console.log("feed me js!!");
-  document.body.innerHTML += bodyTemplate();
+$(function(){
+  
+  new Router();
 
-  $.getJSON('/reviews/latest', function(data) {
-    console.log("data", data)
-    data.forEach(function(item, idx) {
-      console.log(item)
-      $('.splash-subhead').append("<img width='50px' src='"+item.cover+"'/>");
-    })
-  })
+  Backbone.history.start()
 
-};
+})

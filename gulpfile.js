@@ -1,25 +1,23 @@
-var browserify    = require('browserify');
-var gulp          = require('gulp');
-var source        = require('vinyl-source-stream');
-var buffer        = require('vinyl-buffer');
-var uglify        = require('gulp-uglify');
-var sourcemaps    = require('gulp-sourcemaps');
-var exec          = require('child_process').exec;
-var jade          = require('retro-gulp-jade');
-var wrapCommonjs  = require('gulp-wrap-commonjs');
-var plumber       = require('gulp-plumber');
-var sass          = require('gulp-sass');
-var concat        = require('gulp-concat');
-var jshint        = require('gulp-jshint');
-var stylish       = require('jshint-stylish');
-var server        = require('./server');
+var browserify    = require('browserify')
+  , gulp          = require('gulp')
+  , source        = require('vinyl-source-stream')
+  , buffer        = require('vinyl-buffer')
+  , uglify        = require('gulp-uglify')
+  , sourcemaps    = require('gulp-sourcemaps')
+  , exec          = require('child_process').exec
+  , jade          = require('retro-gulp-jade')
+  , wrapCommonjs  = require('gulp-wrap-commonjs')
+  , plumber       = require('gulp-plumber')
+  , sass          = require('gulp-sass')
+  , concat        = require('gulp-concat')
+  , jshint        = require('gulp-jshint')
+  , stylish       = require('jshint-stylish')
+  , server        = require('./server');
 
 'use strict';
 
 gulp.task('default', [ 'watch' ]);
-
 gulp.task('build', [ 'jade', 'lint', 'js', 'sass' ] )
-
 gulp.task('heroku:production', [ 'build' ])
 
 var getBundleName = function () {
@@ -77,7 +75,7 @@ gulp.task('watch', function() {
 
   server.start()
 
-  gulp.watch([ './src/scss/*.scss' ], [ 'sass' ])
+  gulp.watch([ './src/**/*.scss' ], [ 'sass' ])
   gulp.watch([ './src/**/*.js' ], [ 'js' ])
   gulp.watch([ './src/**/*.jade' ], [ 'jade' ])
 
