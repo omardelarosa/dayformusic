@@ -68,11 +68,22 @@ var HomeViews = {
       return Handlebars.compile(require('../../templates/splash')())(attrs);
     },
 
+    appendCovers: function() {
+      if (!this.collection || this.collection.models.length == 0) { return this; }
+      var self = this;
+      this.collection.each(function(review){
+        var imgSrc = review.get('cover')
+        $('.covers').append('<img class="cover" src="'+imgSrc+'"/>');
+      })
+    },
+
     render: function() {
       var avg = this.collection ? this.collection.getAverage() : "";
       this.$el.html(this.template({
+        date: this.collection.fmtDate(),
         scoreAverage: avg
       }));
+      this.appendCovers();
       return this;
     },
 

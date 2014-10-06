@@ -3,7 +3,7 @@ function template(locals) {
 var buf = [];
 var jade_mixins = {};
 
-buf.push("<div class=\"splash\"><h1 class=\"splash-head\">{{scoreAverage}}</h1><p class=\"splash-subhead\">Today's Average</p><p><a href=\"http://purecss.io\" class=\"pure-button pure-button-primary\">Get Started</a></p></div>");;return buf.join("");
+buf.push("<div class=\"splash\"><h1 class=\"splash-subhead\">{{date}}</h1><h1 class=\"splash-head\">{{scoreAverage}}</h1><p class=\"splash-subhead covers\"></p><p></p></div>");;return buf.join("");
 }
 
 /**
