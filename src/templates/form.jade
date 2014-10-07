@@ -3,12 +3,14 @@
 .pure-u-1.pure-u-md-1-2.pure-u-lg-3-5
   h2.content-head.is-center Sign Up
   .l-box-lrg.pure-u-1.pure-u-md-2-5
-    form.pure-form.pure-form-stacked
+    form.pure-form.pure-form-stacked(action='#')
       fieldset
-        label(for='name') Your Name
-        input#name(type='text', placeholder='Your Name')
+        label(for='first_name') Your First Name
+        input#first_name(type='text', placeholder='Your First Name')
+        label(for='last_name') Your Last Name
+        input#last_name(type='text', placeholder='Your Last Name')
         label(for='email') Your Email
         input#email(type='email', placeholder='Your Email')
-        label(for='password') Your Password
-        input#password(type='password', placeholder='Your Password')
-        button.pure-button(type='submit') Sign Up
+        label(for='score_threshold') Your Minimum Score Threshold
+        input#password(type='text', placeholder='0.0 to 10.0 -- this is the lowest scoring review you wish to be notified about')
+        button.pure-button(type='submit') Subscribe
