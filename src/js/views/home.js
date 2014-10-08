@@ -55,6 +55,8 @@ var HomeViews = {
 
   Splash: Backbone.View.extend({
 
+    id: 'day',
+
     initialize: function() {
       // console.log("this", this)
       this.collection = new Day()
@@ -95,9 +97,11 @@ var HomeViews = {
 
     },
 
+    id: 'subscribe',
+
     className: 'ribbon l-box-lrg pure-g',
 
-    _subscribeFormHandler: function  (e) {
+    subscribe: function  (e) {
 
       function createSubscriber (attrs) {
         $.ajax({
@@ -112,29 +116,29 @@ var HomeViews = {
       }
 
       e.preventDefault()
-        var $form = $(e.target)
-        var $email_input = $form.find('input[name=email]')
-        var $score_threshold_input = $form.find('input[name=score_threshold]')
-        var $first_name = $form.find('input[name=first_name]')
-        var $last_name = $form.find('input[name=last_name]')
-        var attrs = {
-          "email": $email_input.val(),
-          "score_threshold": $score_threshold_input.val(),
-          "first_name": $first_name.val(),
-          "last_name": $last_name.val()
-        }
-        createSubscriber(attrs)
-        $email_input.val("")
-        $score_threshold_input.val("")
-        $first_name.val("")
-        $last_name.val("")
+      var $form = $(e.target)
+      var $email_input = $form.find('#email')
+      var $score_threshold_input = $form.find('#score_threshold')
+      var $first_name = $form.find('#first_name')
+      var $last_name = $form.find('#last_name')
+      var attrs = {
+        "email": $email_input.val(),
+        "score_threshold": $score_threshold_input.val(),
+        "first_name": $first_name.val(),
+        "last_name": $last_name.val()
+      }
+      createSubscriber(attrs)
+      $email_input.val("")
+      $score_threshold_input.val("")
+      $first_name.val("")
+      $last_name.val("")
     },
 
     template: require('../../templates/form'),
 
     render: function() {
       this.$el.html(this.template());
-      this.$('.subscribe-form').bind('submit', this._subscribeFormHandler)
+      this.$('.subscribe-form').bind('submit', this.subscribe)
       return this;
     },
 
@@ -143,6 +147,8 @@ var HomeViews = {
   Years: Backbone.View.extend({
 
     className: 'content',
+
+    id: 'years',
 
     template: require('../../templates/years'),
 
