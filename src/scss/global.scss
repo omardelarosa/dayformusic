@@ -146,14 +146,20 @@ a.pure-button-primary {
 .splash {
     /* absolute center .splash within .splash-container */
     width: 80%;
-    height: 50%;
+    height: 80%;
     margin: auto;
     position: absolute;
-    top: 100px; left: 0; bottom: 0; right: 0;
+    top: 50px; left: 0; bottom: 0; right: 0;
     text-align: center;
     text-transform: uppercase;
 }
 
+.splash .gauge-big {
+    // height: 200%;
+    margin: 0;
+    padding: 0;
+    height: 400px;
+}
 /* This is the main heading that appears on the blue section */
 .splash-head {
     font-size: 20px;
