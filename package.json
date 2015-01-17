@@ -29,6 +29,7 @@
     "jade": "^1.6.0",
     "jquery": "^2.1.1",
     "jshint-stylish": "^0.4.0",
+    "lodash": "^2.4.1",
     "logfmt": "^1.2.0",
     "moment": "^2.8.3",
     "mongoskin": "^1.4.4",

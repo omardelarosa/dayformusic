@@ -31,6 +31,32 @@ module.exports = {
         db.close()
       })
 
+  },
+
+  averages: function (req, res, next) {
+    db.bind('reviews')
+
+    db.reviews.aggregate(
+        [ 
+          { 
+            $group: { _id: "$_date", 
+                avgScore: { 
+                  $avg: "$score" 
+                }, 
+              }
+          },
+          { $sort: { _id: 1 } },
+          // { $skip: 2 }
+        ],
+        function (err, results) {
+          if (err) { res.send(500); 
+          console.log("ERROR", err);
+            return; 
+          }
+          res.send(results)
+          db.close()
+        }
+      )
   }
 
 }

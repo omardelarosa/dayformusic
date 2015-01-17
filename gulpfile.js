@@ -58,7 +58,9 @@ gulp.task('jade', function() {
 
 gulp.task('lint', function() {
   return gulp.src('./src/js/**/*.js')
-    .pipe(jshint())
+    .pipe(jshint({
+      laxcomma: true
+    }))
     .pipe(jshint.reporter(stylish));
 })
 

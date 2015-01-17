@@ -3,6 +3,7 @@ var Backbone = require('backbone');
 var HomeView = require('./views/home');
 var bodyTemplate = require('../templates/body');
 var Day = require('./collections/day');
+var App = require('./app');
 
 Backbone.$ = $;
 
@@ -14,14 +15,15 @@ module.exports = Backbone.Router.extend({
 
 
   today: function() {
-    window._d4m = {};
-    var view = new HomeView.Body();
+    // null args means today
     var day = new Day();
-    window._d4m.main_view = view;
-    window._d4m.current_day = day;
-    
-    day.fetch()
-    view.render();
+
+    var app = new App({
+      day: day
+    });
+
+    window._d4m = app;
+
   }
 
-})
+});

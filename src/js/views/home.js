@@ -55,22 +55,23 @@ var HomeViews = {
   
   Body: Backbone.View.extend({
 
-    initialize: function(){
+    initialize: function(opts){
+      this.day = opts.day;
     },
 
     el: function() { return $('#main-container') },
 
     render: function() {
-      console.log("collection", this.collection)
+      console.log("collection", this.day)
       // this.$el.html(this.template());
 
       this.views = {
-        header: new HomeViews.Header(),
-        contentWrapper: new HomeViews.ContentWrapper(),
-        splash: new HomeViews.Splash(),
-        form: new HomeViews.Form(),
-        years: new HomeViews.Years(),
-        footer: new HomeViews.Footer()
+        header: new HomeViews.Header({day: this.day}),
+        contentWrapper: new HomeViews.ContentWrapper({day: this.day}),
+        splash: new HomeViews.Splash({day: this.day}),
+        form: new HomeViews.Form({day: this.day}),
+        years: new HomeViews.Years({day: this.day}),
+        footer: new HomeViews.Footer({day: this.day})
       }
 
       this.$el.append(this.views.header.render().$el);
@@ -89,24 +90,25 @@ var HomeViews = {
 
   ContentWrapper: Backbone.View.extend({
 
-    initialize: function(){
-      this.collection = window._d4m.current_day;
-      this.listenTo(this.collection, 'sync', this.render.bind(this) );
+    initialize: function(opts){
+      // console.log("")
+      this.day = opts.day;
+      this.listenTo(this.day, 'sync', this.render.bind(this) );
     },
 
     className: 'content-wrapper',
 
     appendCovers: function() {
       var self = this;
-      if (!this.collection || this.collection.models.length == 0) { return this; }
+      if (!this.day || this.day.models.length == 0) { return this; }
       if (self.album_views && self.album_views.length > 0) {
         self.album_views.forEach(function(view){ view.remove(); });
       }
       // reset views
       self.album_views = [];
-      var total = this.collection.models.length;
+      var total = this.day.models.length;
 
-      this.collection.each(function(review, idx){
+      this.day.each(function(review, idx){
         // var imgSrc = review.get('cover')
         
         var album = new HomeViews.Album({
@@ -132,9 +134,9 @@ var HomeViews = {
 
     id: 'day',
 
-    initialize: function() {
-      this.collection = window._d4m.current_day
-      this.listenTo(this.collection, 'sync', this.render.bind(this) )
+    initialize: function(opts) {
+      this.day = opts.day;
+      this.listenTo(this.day, 'sync', this.render.bind(this) )
     },
 
     className: 'splash-container',
@@ -144,9 +146,9 @@ var HomeViews = {
     },
 
     render: function() {
-      var avg = this.collection ? this.collection.getAverage() : "";
+      var avg = this.day ? this.day.getAverage() : "";
       this.$el.html(this.template({
-        date: this.collection.fmtDate(),
+        date: this.day.fmtDate(),
         scoreAverage: avg
       }));
       this.gauge = makeGauge(avg, '.gauge-big');
@@ -157,7 +159,7 @@ var HomeViews = {
 
   Form: Backbone.View.extend({
 
-    initialize: function() {
+    initialize: function(opts) {
 
     },
 
@@ -210,6 +212,10 @@ var HomeViews = {
 
   Years: Backbone.View.extend({
 
+    initialize: function(opts) {
+
+    },
+
     className: 'content',
 
     id: 'years',
@@ -225,6 +231,10 @@ var HomeViews = {
 
   Header: Backbone.View.extend({
 
+    initialize: function(opts) {
+
+    },
+
     className: 'header',
 
     template: require('../../templates/partials/_header'),
@@ -237,6 +247,10 @@ var HomeViews = {
   }),
 
   Footer: Backbone.View.extend({
+
+    initialize: function(opts) {
+
+    },
 
     className: 'footer l-box is-center',
 
