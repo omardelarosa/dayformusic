@@ -16,10 +16,9 @@ module.exports = Backbone.Router.extend({
 
   today: function() {
     // null args means today
-    var day = new Day();
 
     var app = new App({
-      day: day
+      day: new Day()
     });
 
     window._d4m = app;

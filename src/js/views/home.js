@@ -57,6 +57,7 @@ var HomeViews = {
 
     initialize: function(opts){
       this.day = opts.day;
+      this.listenTo(this.day, 'sync', this.render.bind(this) );
     },
 
     el: function() { return $('#main-container') },
@@ -222,12 +223,42 @@ var HomeViews = {
 
     template: require('../../templates/years'),
 
-    render: function() {
-      this.$el.html(this.template());
-      return this;
+    appendCharts: function() {
+      this.day;
     },
 
+    render: function() {
+      this.$el.html(this.template());
+      // console.log("years", this.day.years);
+      return this;
+    }
+
   }),
+
+  // Year: Backbone.View.extend({
+  //   initialize: function(opts) {
+
+  //   },
+
+  //   className: 'year',
+
+  //   template: function(attrs){
+  //     return Handlebars.compile(require('../../templates/year')())(attrs);
+  //   },
+
+  //   appendChart: function() {
+  //     var $gauge = $("<span class='pure-u-1-1 gauge-small-"+this.index+"'>");
+  //     this.$('.album-meta-gauge').append($gauge)
+  //     this.gauge = makeGauge(this.model.get('score'), '.gauge-small-'+this.index );
+  //   },
+
+  //   render: function() {
+  //     this.$el.html(this.template({
+  //       year: this.average
+  //     }));
+  //     return this;
+  //   }
+  // }),
 
   Header: Backbone.View.extend({
 
@@ -293,7 +324,7 @@ var HomeViews = {
       this.$('.album-meta-cover').append("<img class='pure-u-1-1 cover'src='"+this.model.get('cover')+"'/>");
       
       return this;
-    },
+    }
   })
 
 }

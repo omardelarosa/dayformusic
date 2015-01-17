@@ -13,7 +13,7 @@ function App (opts) {
 
   // initialize
   this.day = opts.day;
-  this.averages = new Averages();
+  this.day.averages = new Averages();
 
   this.main_view = new HomeView.Body({
     day: this.day,
@@ -21,9 +21,11 @@ function App (opts) {
 
   this.day.fetch({
     success: function(){
-      self.averages.fetch({
+      console.log("FETCHED DAY")
+      self.day.averages.fetch({
       success: function(data) {
-          console.log("AVERAGES", data);
+          console.log("FETCHED AVERAGES", data);
+          self.setAveragesByYear();
         }
       });
     }
@@ -33,11 +35,13 @@ function App (opts) {
 
 }
 
-App.prototype.getAveragesByYear = function() {
-  if (!this.averages) { return {}; }
-  return this.averages.groupBy(function(a){
+App.prototype.setAveragesByYear = function() {
+  if (!this.day || !this.day.averages) { return {}; }
+  var years = this.day.averages.groupBy(function(a){
     return a.attributes._id.slice(0, 4);
-  }) 
+  });
+  this.day.years = years;
+  return years;
 };
 
 module.exports = App;
