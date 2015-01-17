@@ -2,48 +2,52 @@ var $ = require("jquery")
   , Backbone = require('backbone')
   , Day = require('../collections/day')
   , Handlebars = require('handlebars')
+  , Review = require('../models/review')
   , d3 = require('d3')
   , c3 = require('c3');
 
 Backbone.$ = $;
 
 
-function makeGauge (avg, selectorOfTarget) {
+function makeGauge (avg, selectorOfTarget, label) {
+  var percent = Math.round(avg*10);
   var chart = c3.generate({
         bindto: selectorOfTarget,
         data: {
             columns: [
-                ['average', Math.round(avg*100)/100]
+                ['% score', percent ]
             ],
             type: 'gauge',
             onclick: function (d, i) { console.log("onclick", d, i); },
-            onmouseover: function (d, i) { console.log("onmouseover", d, i); },
-            onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+            // onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+            // onmouseout: function (d, i) { console.log("onmouseout", d, i); }
         },
         gauge: {
           label: {
              format: function(value, ratio) {
-                 return value;
+                 return value/10;
              },
-             // show: false // to turn off the min/max labels.
+             show: false // to turn off the min/max labels.
           },
         min: 0, // 0 is default, //can handle negative min e.g. vacuum / voltage / current flow / rate of change
-        max: 10.0, // 100 is default
+        max: 100, // 100 is default
         units: '',
            width: 39 // for adjusting arc thickness
         },
         color: {
             pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'], // the three color levels for the percentage values.
+
             threshold: {
-              unit: 'points', // percentage is default
-              max: 10.0, // 100 is default
-              values: [4.0, 6.0, 8.0, 9.0, 10.0]
+              unit: ' %', // percentage is default
+              max: 100, // 100 is default
+              values: [50, 60, 70, 90]
             }
         },
         size: {
           height: 200
         }
     });
+  // console.log("MAKING CHART", chart, arguments);
   return chart;
 }
 
@@ -93,11 +97,27 @@ var HomeViews = {
     className: 'content-wrapper',
 
     appendCovers: function() {
-      if (!this.collection || this.collection.models.length == 0) { return this; }
       var self = this;
-      this.collection.each(function(review){
-        var imgSrc = review.get('cover')
-        $('.covers').append('<img class="cover" src="'+imgSrc+'"/>');
+      if (!this.collection || this.collection.models.length == 0) { return this; }
+      if (self.album_views && self.album_views.length > 0) {
+        self.album_views.forEach(function(view){ view.remove(); });
+      }
+      // reset views
+      self.album_views = [];
+      var total = this.collection.models.length;
+
+      this.collection.each(function(review, idx){
+        // var imgSrc = review.get('cover')
+        
+        var album = new HomeViews.Album({
+          model: review,
+          total: total,
+          index: idx
+        });
+        album.render();
+        self.album_views.push(album)
+        $('.albums').append(album.$el);
+        album.appendChart();
       })
     },
 
@@ -227,6 +247,39 @@ var HomeViews = {
       return this;
     },
 
+  }),
+
+  Album: Backbone.View.extend({
+
+    initialize: function(opts) {
+      this.total = opts.total || 0;
+      this.index = opts.index || 0;
+    },
+
+    model: Review,
+
+    className: 'album',
+
+    template: function(attrs){
+      return Handlebars.compile(require('../../templates/album')())(attrs);
+    },
+
+    appendChart: function() {
+      var $gauge = $("<span class='pure-u-1-1 gauge-small-"+this.index+"'>");
+      this.$('.album-meta-gauge').append($gauge)
+      this.gauge = makeGauge(this.model.get('score'), '.gauge-small-'+this.index );
+    },
+
+    render: function() {
+      this.$el.html(this.template({
+        title: this.model.get('album'),
+        artist: this.model.get('artist')
+      }));
+      this.$el.addClass("pure-u-1-"+this.total);
+      this.$('.album-meta-cover').append("<img class='pure-u-1-1 cover'src='"+this.model.get('cover')+"'/>");
+      
+      return this;
+    },
   })
 
 }
