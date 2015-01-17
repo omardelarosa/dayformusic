@@ -7,6 +7,46 @@ var $ = require("jquery")
 
 Backbone.$ = $;
 
+
+function makeGauge (avg, selectorOfTarget) {
+  var chart = c3.generate({
+        bindto: selectorOfTarget,
+        data: {
+            columns: [
+                ['average', Math.round(avg*100)/100]
+            ],
+            type: 'gauge',
+            onclick: function (d, i) { console.log("onclick", d, i); },
+            onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+            onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+        },
+        gauge: {
+          label: {
+             format: function(value, ratio) {
+                 return value;
+             },
+             // show: false // to turn off the min/max labels.
+          },
+        min: 0, // 0 is default, //can handle negative min e.g. vacuum / voltage / current flow / rate of change
+        max: 10.0, // 100 is default
+        units: '',
+           width: 39 // for adjusting arc thickness
+        },
+        color: {
+            pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'], // the three color levels for the percentage values.
+            threshold: {
+              unit: 'points', // percentage is default
+              max: 10.0, // 100 is default
+              values: [4.0, 6.0, 8.0, 9.0, 10.0]
+            }
+        },
+        size: {
+          height: 200
+        }
+    });
+  return chart;
+}
+
 var HomeViews = {
   
   Body: Backbone.View.extend({
@@ -46,32 +86,11 @@ var HomeViews = {
   ContentWrapper: Backbone.View.extend({
 
     initialize: function(){
+      this.collection = window._d4m.current_day;
+      this.listenTo(this.collection, 'sync', this.render.bind(this) );
     },
 
     className: 'content-wrapper',
-
-    render: function() {
-      return this;
-    }
-
-  }),
-
-  Splash: Backbone.View.extend({
-
-    id: 'day',
-
-    initialize: function() {
-      // console.log("this", this)
-      this.collection = new Day()
-      this.collection.fetch()
-      this.listenTo(this.collection, 'sync', this.render.bind(this) )
-    },
-
-    className: 'splash-container',
-
-    template: function(attrs){
-      return Handlebars.compile(require('../../templates/splash')())(attrs);
-    },
 
     appendCovers: function() {
       if (!this.collection || this.collection.models.length == 0) { return this; }
@@ -83,49 +102,34 @@ var HomeViews = {
     },
 
     render: function() {
+      this.appendCovers();
+      return this;
+    }
+
+  }),
+
+  Splash: Backbone.View.extend({
+
+    id: 'day',
+
+    initialize: function() {
+      this.collection = window._d4m.current_day
+      this.listenTo(this.collection, 'sync', this.render.bind(this) )
+    },
+
+    className: 'splash-container',
+
+    template: function(attrs){
+      return Handlebars.compile(require('../../templates/splash')())(attrs);
+    },
+
+    render: function() {
       var avg = this.collection ? this.collection.getAverage() : "";
       this.$el.html(this.template({
         date: this.collection.fmtDate(),
         scoreAverage: avg
       }));
-      this.appendCovers();
-
-      var chart = c3.generate({
-            bindto: '.gauge-big',
-            data: {
-                columns: [
-                    ['average', Math.round(avg*100)/100]
-                ],
-                type: 'gauge',
-                onclick: function (d, i) { console.log("onclick", d, i); },
-                onmouseover: function (d, i) { console.log("onmouseover", d, i); },
-                onmouseout: function (d, i) { console.log("onmouseout", d, i); }
-            },
-            gauge: {
-              label: {
-                 format: function(value, ratio) {
-                     return value;
-                 },
-                 // show: false // to turn off the min/max labels.
-              },
-            min: 0, // 0 is default, //can handle negative min e.g. vacuum / voltage / current flow / rate of change
-            max: 10.0, // 100 is default
-            units: '',
-               width: 39 // for adjusting arc thickness
-            },
-            color: {
-                pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'], // the three color levels for the percentage values.
-                threshold: {
-                  unit: 'points', // percentage is default
-                  max: 10.0, // 100 is default
-                  values: [4.0, 6.0, 8.0, 9.0, 10.0]
-                }
-            },
-            size: {
-              height: 200
-            }
-        });
-
+      this.gauge = makeGauge(avg, '.gauge-big');
       return this;
     },
 
