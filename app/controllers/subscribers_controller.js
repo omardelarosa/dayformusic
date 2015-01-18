@@ -26,7 +26,7 @@ module.exports = {
       .toArray(function(err, results){
         if (err) { res.send(500); return; }
             // if there are less than 200 subscribers
-        if (results.length < 10) {
+        if (results.length < 200) {
           db.subscribers.insert(subscriber, function (err, doc) {
             if (err) { res.send(500); return; }
             res.send(doc)
