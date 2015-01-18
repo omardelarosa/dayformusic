@@ -259,8 +259,18 @@ var HomeViews = {
           data: attrs, 
           success: function (res, statusText, req) {
             console.log("res", res)
+            if (res[0] && res[0].message) {
+              if (res[0].message === "full") {
+                handleFullSubscriberList(attrs)
+              }
+            }
           }
         })
+      }
+
+      function handleFullSubscriberList(attrs){
+        // TODO: turn this into a modal
+        alert("Full Subscriber List!");
       }
 
       e.preventDefault()
