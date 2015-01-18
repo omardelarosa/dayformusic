@@ -130,27 +130,50 @@ YearChart.prototype.unloadYear = function(year, delay) {
     
 }
 
-function TopChart (type, data) {
+function TopChart (type, collection) {
 
   var self = this;
   var columns = [[ "name" ]];
   var x = [ "name" ];
+  var selector = '.'+type+'-chart';
+  var data = collection.toJSON().map(function(input){
+    var output = {}
+    output["scoreAvg"] = Math.round(input.scoreAvg*100)/100;
+    output[input["_id"]] = input.totalReviews;
+    return output;
+  });
+  var values = collection.toJSON().map(function(i){ return i["_id"]; })
 
-  _.each(data, function(el, idx, list) {
-    var row = [ el["_id"], el["scoreAvg"] ];
-    columns[0].push( el["totalReviews"] );
-    columns.push(row);
-  })
+  var range = ("type" === "artists" ? { max: 9, min: 5} : {max: 6, max: 8 });
 
-  console.log("COLUMNS", columns)
-  // this.chart = c3.generate({
-  //   bindto: selector,
-  //   data: {
-  //     x: "_id",
-  //     columns: columns,
-  //     type: 'bar'
-  //   }
-  // });
+  this.chart = c3.generate({
+    bindto: selector,
+    data: {
+      json: data,
+      type: 'scatter',
+      keys: {
+        x: "scoreAvg",
+        value: values
+      }
+    },
+    point: {
+      r: 10
+    },
+    axis: {
+      y: {
+        label: "Total Reviews"
+      },
+      x: {
+        max: range.max,
+        min: range.min,
+        tick: {
+          fit: true,
+          centered: true
+        },
+        label: "Average Score"
+      }
+    }
+  });
 
 }
 
@@ -172,6 +195,8 @@ var HomeViews = {
         splash: new HomeViews.Splash({day: this.day}),
         form: new HomeViews.Form({day: this.day}),
         years: new HomeViews.Years({day: this.day}),
+        artists: new HomeViews.Artists({day: this.day}),
+        reviewers: new HomeViews.Reviewers({day: this.day}),
         footer: new HomeViews.Footer({day: this.day})
       }
 
@@ -327,7 +352,6 @@ var HomeViews = {
       var self = this;
       this.day = opts.day;
       this.listenTo(this.day, "yearsSet", function(){
-        console.log("YEARS SET");
         self.appendCharts();
       })
     },
@@ -379,8 +403,7 @@ var HomeViews = {
       var self = this;
       this.day = opts.day;
       this.listenTo(this.day, "artistsSet", function(){
-        console.log("ARTISTS SET");
-        
+        self.appendCharts();
       })
     },
 
@@ -388,6 +411,32 @@ var HomeViews = {
 
     appendCharts: function() {
 
+      this.chart = new TopChart("artists", this.day.artists);
+    
+    },
+
+    render: function() {
+      // this.$el.html(this.template());
+      return this;
+    }
+
+  }),
+
+  Reviewers: Backbone.View.extend({
+
+    initialize: function(opts) {
+      var self = this;
+      this.day = opts.day;
+      this.listenTo(this.day, "reviewersSet", function(){
+        self.appendCharts();
+      })
+    },
+
+    el: function(){ return $('.reviewers-chart'); },
+
+    appendCharts: function() {
+
+      this.chart = new TopChart("reviewers", this.day.reviewers);
     
     },
 

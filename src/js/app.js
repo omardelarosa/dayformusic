@@ -39,14 +39,16 @@ function App (opts) {
   $.ajax({
     url: '/charts/bundle'
   }).done(function(data){
-    console.log("DAY FETCHED")
     self.day.add(data["latest"]);
     self.day.trigger('daySet');
     self.day.averages.add(data["averages"]);
     self.setAveragesByYear();
     self.day.trigger('yearsSet');
-    console.log("YEARS SET");
-  })
+    self.day.artists.add(data["artists"]);
+    self.day.trigger('artistsSet');
+    self.day.reviewers.add(data["reviewers"]);
+    self.day.trigger('reviewersSet');
+  });
 
   this.main_view.render();
 
