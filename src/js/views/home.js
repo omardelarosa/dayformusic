@@ -54,36 +54,21 @@ function makeGauge (avg, selectorOfTarget, label) {
 }
 
 function YearChart (day, selector) {
+  var self = this;
   var years = day.years;
+  this.years = years;
   var descYears = day.descendingYears;
-  var columns = [];
-  // descYears.forEach(function(year, idx) {
-  //   var row = []
-  //   row.push(year);
-  //   _.each(years[year], function(model, date){
-  //     row.push(model.attributes.avgScore);
-  //   })
-  //   columns.push(row);
-  // });
-  var oneYear = years[descYears[0]].map(function(m){ 
-    return {
-      date: moment(m.attributes._id).format('YYYY-MM-DD'),
-      avgScore: Math.round(parseFloat(m.attributes.avgScore)*10)/10
-    }
-  })
-  console.log("ONE YEAR", oneYear)
+  this.descYears = descYears;
+  
   this.chart = c3.generate({
     bindto: selector,
     data: {
       xFormat: '%Y-%m-%d',
-      json: oneYear,
+      json: [],
       keys: {
         x: "date",
-        value: [ "avgScore" ]
+        value: [ "Average Scores" ]
       },
-      names: {
-        data1: "2014"
-      }
     },
     axis: {
         x: {
@@ -104,6 +89,27 @@ function YearChart (day, selector) {
         }
     }
   });
+}
+
+YearChart.prototype.loadYear = function(year, delay) {
+  var self = this;
+  var ms = delay || 1000;
+  var data = this.years[year].map(function(m){ 
+    return {
+      date: moment(m.attributes._id).format('YYYY-MM-DD'),
+      avgScore: Math.round(parseFloat(m.attributes.avgScore)*10)/10
+    }
+  })
+  setTimeout(function () {
+    self.chart.load({
+        xFormat: '%Y-%m-%d',
+        json: data,
+        keys: {
+          x: "date",
+          value: [ "avgScore" ]
+        }
+      })
+  }, ms);
 }
 
 var HomeViews = {
@@ -284,19 +290,24 @@ var HomeViews = {
 
     appendCharts: function() {
       var self = this;
-      console.log("APPENDING CHARTS", this.day.years);
-      // var totalYears = this.day.descendingYears.length;
-      // this.yearViews = [];
-      // _.each(this.day.descendingYears, function(year, idx){
-      //   var yearView = new HomeViews.Year({ 
-      //     yearNum: year,
-      //     dates: self.day.years[year],
-      //     className: "pure-u-1-"+totalYears+" year-button-"+idx
-      //   });
-      //   self.yearViews.push(yearView);
-      //   self.$('.years-buttons').append(yearView.render().$el);
-      // });
+      var totalYears = this.day.descendingYears.length;
       this.chart = new YearChart(this.day, '.years-chart');
+
+      this.yearViews = [];
+      _.each(this.day.descendingYears, function(year, idx){
+
+        var yearView = new HomeViews.Year({ 
+          yearNum: year,
+          dates: self.day.years[year],
+          className: "pure-u-1-"+totalYears+" year-button-"+idx,
+          c3: self.chart
+        });
+        self.yearViews.push(yearView);
+        self.$('.years-buttons').append(yearView.render().$el);
+      });
+
+     // load latest year
+    this.yearViews[0].loadYear.call(this.yearViews[0]);
     },
 
     render: function() {
@@ -310,11 +321,24 @@ var HomeViews = {
     initialize: function(opts) {
       this.yearNum = opts.yearNum;
       this.dates = opts.dates;
+      this.c3 = opts.c3;
     },
 
     className: 'year',
 
     tagName: 'span',
+
+    events: {
+      "click .year-button": "loadYear"
+    },
+
+    loadYear: function(e){
+      console.log("LOADING YEAR", arguments, this);
+      $('.year-button').removeClass('selected');
+      this.$('.year-button').addClass('selected');
+      this.c3.chart.unload();
+      this.c3.loadYear(this.yearNum);
+    },
 
     template: function(attrs){
       return Handlebars.compile(require('../../templates/year')())(attrs);

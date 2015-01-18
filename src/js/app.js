@@ -22,10 +22,9 @@ function App (opts) {
 
   this.day.fetch({
     success: function(){
-      console.log("FETCHED DAY")
+      self.day.trigger('daySet');
       self.day.averages.fetch({
       success: function(data) {
-          console.log("FETCHED AVERAGES", data);
           self.setAveragesByYear();
           self.day.trigger('yearsSet');
         }

@@ -3,7 +3,7 @@ function template(locals) {
 var buf = [];
 var jade_mixins = {};
 
-buf.push("<span class=\"year-button\">{{year}}</span>");;return buf.join("");
+buf.push("<a class=\"year-button pure-button\">{{year}}</a>");;return buf.join("");
 }
 
 /**
