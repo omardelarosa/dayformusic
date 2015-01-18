@@ -4,6 +4,8 @@ var HomeView = require('./views/home');
 var bodyTemplate = require('../templates/body');
 var Day = require('./collections/day');
 var Averages = require('./collections/averages');
+var Artists = require('./collections/artists');
+var Reviewers = require('./collections/reviewers');
 _ = require('lodash');
 
 Backbone.$ = $;
@@ -15,22 +17,36 @@ function App (opts) {
   // initialize
   this.day = opts.day;
   this.day.averages = new Averages();
+  this.day.reviewers = new Reviewers();
+  this.day.artists = new Artists();
 
   this.main_view = new HomeView.Body({
     day: this.day,
   });
 
-  this.day.fetch({
-    success: function(){
-      self.day.trigger('daySet');
-      self.day.averages.fetch({
-      success: function(data) {
-          self.setAveragesByYear();
-          self.day.trigger('yearsSet');
-        }
-      });
-    }
-  });
+  // TODO: pack this all up into a single query
+  // this.day.fetch()
+  // .done(function(data){
+  //   self.day.trigger('daySet');
+  //   self.day.averages.add()
+  //     .done(function(data) {
+  //       self.setAveragesByYear();
+  //       self.day.trigger('yearsSet');
+  //       console.log("YEARS SET")
+  //     });
+  // })
+
+  $.ajax({
+    url: '/charts/bundle'
+  }).done(function(data){
+    console.log("DAY FETCHED")
+    self.day.add(data["latest"]);
+    self.day.trigger('daySet');
+    self.day.averages.add(data["averages"]);
+    self.setAveragesByYear();
+    self.day.trigger('yearsSet');
+    console.log("YEARS SET");
+  })
 
   this.main_view.render();
 

@@ -1,41 +1,69 @@
 var moment = require('moment')
   , mongo = require('mongoskin')
-  , db = mongo.db(process.env.MONGOLAB_URI, {native_parser:true});
+  , db = mongo.db(process.env.MONGOLAB_URI, {native_parser:true})
+  , Q = require('q');
 
-module.exports = {
+// DB functions as promises
 
-  today: function (req, res, next ) {
+function handleError(err, res) {
+  console.log("ERROR", err);
+  res.send(500)
+}
 
-    db.bind('reviews')
+function closeDb(db) {
+  db.close();
+}
 
+function getAverages (db)  {
+  return Q.Promise(function(resolve, reject, notify) {
+    db.reviews.aggregate(
+        [ 
+          { 
+            $group: { _id: "$_date", 
+                avgScore: { 
+                  $avg: "$score" 
+                }, 
+              }
+          },
+          { $sort: { _id: 1 } },
+        ],
+        function (err, docs) {
+          if (err) { 
+            return reject(err);
+          }
+          resolve(docs)
+        }
+      )
+  });
+}
+
+function getToday (db) {
+  return Q.Promise(function(resolve, reject, notify){
     db.reviews
       .find({
         _date: new Date(moment().startOf('day').toString())
       })
-      .toArray(function (err, results) {
-        res.send(results)
-        db.close()
+      .toArray(function (err, docs) {
+        if (err) { return reject(err); }
+        resolve(docs)
       })
+  })
+}
 
-  },
-
-  latest: function (req, res, next) {
-
-    db.bind('reviews')
-
+function getLatest (db) {
+  return Q.Promise(function(resolve, reject, notify){
     db.reviews.find({})
       .sort({ _date: -1})
       .limit(5)
-      .toArray(function (err, results) {
-        res.send(results)
-        db.close()
+      .toArray(function (err, docs) {
+        if (err) { return reject(err); }
+        resolve(docs)
       })
+  })
+}
 
-  },
-
-  topArtists: function(req, res, next) {
-    db.bind('reviews')
-
+function getTopArtists (db) {
+  return Q.Promise(function(resolve, reject, notify){
     db.reviews
       .aggregate(
         [
@@ -58,17 +86,16 @@ module.exports = {
           { $sort: { totalReviews: -1, scoreAvg: 1 } },
           { $limit : 50 }
         ],
-        function (err, results) {
-          if (err) { res.send(500); return; }
-          res.send(results)
-          db.close()
+        function (err, docs) {
+          if (err) { return reject(err); }
+          resolve(docs)
         }
       )
-  },
+  })
+}
 
-  topReviewers: function(req, res, next) {
-    db.bind('reviews')
-
+function getTopReviewers (db) {
+  return Q.Promise(function(resolve, reject, notify){
     db.reviews
       .aggregate(
         [
@@ -86,38 +113,113 @@ module.exports = {
           { $sort: { totalReviews: -1, scoreAvg: 1 } },
           { $limit : 50 }
         ],
-        function (err, results) {
-          if (err) { res.send(500); return; }
-          res.send(results)
-          db.close()
+        function (err, docs) {
+          if (err) { return reject(err); }
+          resolve(docs)
         }
       )
+  })
+}
+
+module.exports = {
+
+  today: function (req, res, next ) {
+
+    db.bind('reviews')
+
+    getToday(db)
+      .then(function(docs){
+        res.send(docs)
+      })
+      .catch(handleError.bind(this) )
+      .then(closeDb.bind(this, db) );
+
+  },
+
+  latest: function (req, res, next) {
+
+    db.bind('reviews')
+
+    getLatest(db)
+      .then(function(docs){
+        res.send(docs)
+      })
+      .catch(handleError.bind(this) )
+      .then(closeDb.bind(this, db) );
+
+  },
+
+  topArtists: function(req, res, next) {
+    db.bind('reviews')
+
+    getTopArtists(db)
+      .then(function(docs){
+        res.send(docs)
+      })
+      .catch(handleError.bind(this) )
+      .then(closeDb.bind(this, db) );
+  },
+
+  topReviewers: function(req, res, next) {
+    db.bind('reviews')
+
+    getTopReviewers(db)
+      .then(function(docs){
+        res.send(docs)
+      })
+      .catch(handleError.bind(this) )
+      .then(closeDb.bind(this, db) );
   },
 
   averages: function (req, res, next) {
     db.bind('reviews')
 
-    db.reviews.aggregate(
-        [ 
-          { 
-            $group: { _id: "$_date", 
-                avgScore: { 
-                  $avg: "$score" 
-                }, 
-              }
-          },
-          { $sort: { _id: 1 } },
-          // { $skip: 2 }
-        ],
-        function (err, results) {
-          if (err) { res.send(500); 
-          console.log("ERROR", err);
-            return; 
-          }
-          res.send(results)
-          db.close()
-        }
-      )
+    getAverages(db)
+      .then(function(docs){
+        res.send(docs)
+      })
+      .catch(handleError.bind(this) )
+      .then(closeDb.bind(this, db) );
+  },
+
+  chartDataBundle: function(req, res, next) {
+    
+    var bundle = {};
+
+    db.bind('reviews');
+
+    getLatest(db)
+      .then(function(docs){
+        bundle["latest"] = docs;
+      })
+      .catch(handleError.bind(this) )
+      .then(function(docs){
+        return getAverages(db)
+          .then(function(docs){
+            bundle["averages"] = docs;
+          })
+          .catch(handleError.bind(this) )
+      })
+      .then(function(docs){
+        return getTopArtists(db)
+          .then(function(docs){
+            bundle["artists"] = docs;
+          })
+          .catch(handleError.bind(this) )
+      })
+      .then(function(docs){
+        return getTopReviewers(db)
+          .then(function(docs){
+            bundle["reviewers"] = docs;
+          })
+          .catch(handleError.bind(this) )
+      })
+      .catch(handleError.bind(this))
+      .then(function(){
+        res.send(bundle);
+        closeDb.bind(this, db)
+      });
+
   }
 
 }

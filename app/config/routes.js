@@ -10,6 +10,8 @@ module.exports = function (app) {
 
   app.get('/reviews/top-reviewers', controllers.reviews.topReviewers )
 
+  app.get('/charts/bundle', controllers.reviews.chartDataBundle )
+
   app.post('/subscribers', controllers.subscribers.create )
 
 }

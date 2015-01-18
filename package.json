@@ -33,6 +33,7 @@
     "logfmt": "^1.2.0",
     "moment": "^2.8.3",
     "mongoskin": "^1.4.4",
+    "q": "^1.1.2",
     "retro-gulp-jade": "^0.5.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.0.0"

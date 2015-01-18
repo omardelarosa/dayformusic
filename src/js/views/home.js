@@ -52,7 +52,6 @@ function makeGauge (avg, selectorOfTarget, label) {
           height: 200
         }
     });
-  // console.log("MAKING CHART", chart, arguments);
   return chart;
 }
 
@@ -68,7 +67,6 @@ function YearChart (day, selector) {
   this.descYears = descYears;
   var values = descYears.map(scoreKey);
 
-  console.log("values", values, descYears);
   this.chart = c3.generate({
     bindto: selector,
     data: {
@@ -84,7 +82,6 @@ function YearChart (day, selector) {
           type: 'timeseries',
           tick: {
             format: function (x) { 
-              // console.log("args", arguments)
               return moment(x).format('MMM Do'); 
             },
             culling: {
@@ -133,6 +130,30 @@ YearChart.prototype.unloadYear = function(year, delay) {
     
 }
 
+function TopChart (type, data) {
+
+  var self = this;
+  var columns = [[ "name" ]];
+  var x = [ "name" ];
+
+  _.each(data, function(el, idx, list) {
+    var row = [ el["_id"], el["scoreAvg"] ];
+    columns[0].push( el["totalReviews"] );
+    columns.push(row);
+  })
+
+  console.log("COLUMNS", columns)
+  // this.chart = c3.generate({
+  //   bindto: selector,
+  //   data: {
+  //     x: "_id",
+  //     columns: columns,
+  //     type: 'bar'
+  //   }
+  // });
+
+}
+
 var HomeViews = {
   
   Body: Backbone.View.extend({
@@ -144,8 +165,6 @@ var HomeViews = {
     el: function() { return $('#main-container') },
 
     render: function() {
-      console.log("collection", this.day)
-      // this.$el.html(this.template());
 
       this.views = {
         header: new HomeViews.Header({day: this.day}),
@@ -175,7 +194,7 @@ var HomeViews = {
     initialize: function(opts){
       // console.log("")
       this.day = opts.day;
-      this.listenTo(this.day, 'sync', this.render.bind(this) );
+      this.listenTo(this.day, 'daySet', this.render.bind(this) );
     },
 
     className: 'content-wrapper',
@@ -218,7 +237,7 @@ var HomeViews = {
 
     initialize: function(opts) {
       this.day = opts.day;
-      this.listenTo(this.day, 'sync', this.render.bind(this) )
+      this.listenTo(this.day, 'daySet', this.render.bind(this) )
     },
 
     className: 'splash-container',
@@ -349,6 +368,31 @@ var HomeViews = {
 
     render: function() {
       this.$el.html(this.template());
+      return this;
+    }
+
+  }),
+
+  Artists: Backbone.View.extend({
+
+    initialize: function(opts) {
+      var self = this;
+      this.day = opts.day;
+      this.listenTo(this.day, "artistsSet", function(){
+        console.log("ARTISTS SET");
+        
+      })
+    },
+
+    el: function(){ return $('.artists-chart'); },
+
+    appendCharts: function() {
+
+    
+    },
+
+    render: function() {
+      // this.$el.html(this.template());
       return this;
     }
 
