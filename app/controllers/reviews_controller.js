@@ -33,6 +33,67 @@ module.exports = {
 
   },
 
+  topArtists: function(req, res, next) {
+    db.bind('reviews')
+
+    db.reviews
+      .aggregate(
+        [
+          { 
+            $match : {
+              artist : { $not: { $eq: "Various Artists" } }
+            }
+          },
+          {
+            $group: { 
+                _id: "$artist", 
+                scoreAvg: { 
+                  $avg: "$score" 
+                },
+                totalReviews: {
+                  $sum: 1
+                }
+              }
+          },
+          { $sort: { totalReviews: -1, scoreAvg: 1 } },
+          { $limit : 50 }
+        ],
+        function (err, results) {
+          if (err) { res.send(500); return; }
+          res.send(results)
+          db.close()
+        }
+      )
+  },
+
+  topReviewers: function(req, res, next) {
+    db.bind('reviews')
+
+    db.reviews
+      .aggregate(
+        [
+          {
+            $group: { 
+                _id: "$author", 
+                scoreAvg: { 
+                  $avg: "$score" 
+                },
+                totalReviews: {
+                  $sum: 1
+                }
+              }
+          },
+          { $sort: { totalReviews: -1, scoreAvg: 1 } },
+          { $limit : 50 }
+        ],
+        function (err, results) {
+          if (err) { res.send(500); return; }
+          res.send(results)
+          db.close()
+        }
+      )
+  },
+
   averages: function (req, res, next) {
     db.bind('reviews')
 

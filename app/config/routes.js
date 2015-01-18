@@ -6,6 +6,10 @@ module.exports = function (app) {
 
   app.get('/reviews/averages', controllers.reviews.averages )
 
+  app.get('/reviews/top-artists', controllers.reviews.topArtists )
+
+  app.get('/reviews/top-reviewers', controllers.reviews.topReviewers )
+
   app.post('/subscribers', controllers.subscribers.create )
 
 }
