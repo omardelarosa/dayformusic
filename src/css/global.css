@@ -169,6 +169,11 @@ a.pure-button-primary {
 .album {
   display: inline; }
 
+.year-button {
+  padding: 5px;
+  margin: 2px;
+  border: 2px solid black; }
+
 /* This is the class used for the main content headers (<h2>) */
 .content-head {
   font-weight: 400;

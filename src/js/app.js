@@ -4,6 +4,7 @@ var HomeView = require('./views/home');
 var bodyTemplate = require('../templates/body');
 var Day = require('./collections/day');
 var Averages = require('./collections/averages');
+_ = require('lodash');
 
 Backbone.$ = $;
 
@@ -26,6 +27,7 @@ function App (opts) {
       success: function(data) {
           console.log("FETCHED AVERAGES", data);
           self.setAveragesByYear();
+          self.day.trigger('yearsSet');
         }
       });
     }
@@ -41,6 +43,8 @@ App.prototype.setAveragesByYear = function() {
     return a.attributes._id.slice(0, 4);
   });
   this.day.years = years;
+  this.day.descendingYears = _.sortBy(Object.keys(this.day.years), function(y){ return parseInt(y); }).reverse();
+
   return years;
 };
 

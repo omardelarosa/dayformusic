@@ -4,7 +4,9 @@ var $ = require("jquery")
   , Handlebars = require('handlebars')
   , Review = require('../models/review')
   , d3 = require('d3')
-  , c3 = require('c3');
+  , c3 = require('c3')
+  , _ = require('lodash')
+  , moment = require('moment');
 
 Backbone.$ = $;
 
@@ -51,13 +53,65 @@ function makeGauge (avg, selectorOfTarget, label) {
   return chart;
 }
 
+function YearChart (day, selector) {
+  var years = day.years;
+  var descYears = day.descendingYears;
+  var columns = [];
+  // descYears.forEach(function(year, idx) {
+  //   var row = []
+  //   row.push(year);
+  //   _.each(years[year], function(model, date){
+  //     row.push(model.attributes.avgScore);
+  //   })
+  //   columns.push(row);
+  // });
+  var oneYear = years[descYears[0]].map(function(m){ 
+    return {
+      date: moment(m.attributes._id).format('YYYY-MM-DD'),
+      avgScore: Math.round(parseFloat(m.attributes.avgScore)*10)/10
+    }
+  })
+  console.log("ONE YEAR", oneYear)
+  this.chart = c3.generate({
+    bindto: selector,
+    data: {
+      xFormat: '%Y-%m-%d',
+      json: oneYear,
+      keys: {
+        x: "date",
+        value: [ "avgScore" ]
+      },
+      names: {
+        data1: "2014"
+      }
+    },
+    axis: {
+        x: {
+          type: 'timeseries',
+          tick: {
+            format: function (x) { 
+              // console.log("args", arguments)
+              return moment(x).format('MMM Do, YYYY'); 
+            },
+            culling: {
+              max: 10
+            }
+          }
+        },
+        y: {
+          max: 10,
+          min: 1
+        }
+    }
+  });
+}
+
 var HomeViews = {
   
   Body: Backbone.View.extend({
 
     initialize: function(opts){
       this.day = opts.day;
-      this.listenTo(this.day, 'sync', this.render.bind(this) );
     },
 
     el: function() { return $('#main-container') },
@@ -214,7 +268,12 @@ var HomeViews = {
   Years: Backbone.View.extend({
 
     initialize: function(opts) {
-
+      var self = this;
+      this.day = opts.day;
+      this.listenTo(this.day, "yearsSet", function(){
+        console.log("YEARS SET");
+        self.appendCharts();
+      })
     },
 
     className: 'content',
@@ -224,41 +283,56 @@ var HomeViews = {
     template: require('../../templates/years'),
 
     appendCharts: function() {
-      this.day;
+      var self = this;
+      console.log("APPENDING CHARTS", this.day.years);
+      // var totalYears = this.day.descendingYears.length;
+      // this.yearViews = [];
+      // _.each(this.day.descendingYears, function(year, idx){
+      //   var yearView = new HomeViews.Year({ 
+      //     yearNum: year,
+      //     dates: self.day.years[year],
+      //     className: "pure-u-1-"+totalYears+" year-button-"+idx
+      //   });
+      //   self.yearViews.push(yearView);
+      //   self.$('.years-buttons').append(yearView.render().$el);
+      // });
+      this.chart = new YearChart(this.day, '.years-chart');
     },
 
     render: function() {
       this.$el.html(this.template());
-      // console.log("years", this.day.years);
       return this;
     }
 
   }),
 
-  // Year: Backbone.View.extend({
-  //   initialize: function(opts) {
+  Year: Backbone.View.extend({
+    initialize: function(opts) {
+      this.yearNum = opts.yearNum;
+      this.dates = opts.dates;
+    },
 
-  //   },
+    className: 'year',
 
-  //   className: 'year',
+    tagName: 'span',
 
-  //   template: function(attrs){
-  //     return Handlebars.compile(require('../../templates/year')())(attrs);
-  //   },
+    template: function(attrs){
+      return Handlebars.compile(require('../../templates/year')())(attrs);
+    },
 
-  //   appendChart: function() {
-  //     var $gauge = $("<span class='pure-u-1-1 gauge-small-"+this.index+"'>");
-  //     this.$('.album-meta-gauge').append($gauge)
-  //     this.gauge = makeGauge(this.model.get('score'), '.gauge-small-'+this.index );
-  //   },
+    appendChart: function() {
+      var $gauge = $("<span class='pure-u-1-1 gauge-small-"+this.index+"'>");
+      this.$('.album-meta-gauge').append($gauge)
+      this.gauge = makeGauge(this.model.get('score'), '.gauge-small-'+this.index );
+    },
 
-  //   render: function() {
-  //     this.$el.html(this.template({
-  //       year: this.average
-  //     }));
-  //     return this;
-  //   }
-  // }),
+    render: function() {
+      this.$el.html(this.template({
+        year: this.yearNum
+      }));
+      return this;
+    }
+  }),
 
   Header: Backbone.View.extend({
 
