@@ -10,6 +10,9 @@ var $ = require("jquery")
 
 Backbone.$ = $;
 
+function scoreKey(year){
+  return year+" Average Score";
+}
 
 function makeGauge (avg, selectorOfTarget, label) {
   var percent = Math.round(avg*10);
@@ -53,21 +56,27 @@ function makeGauge (avg, selectorOfTarget, label) {
   return chart;
 }
 
+function fmtYears (years) {
+
+}
+
 function YearChart (day, selector) {
   var self = this;
   var years = day.years;
   this.years = years;
   var descYears = day.descendingYears;
   this.descYears = descYears;
-  
+  var values = descYears.map(scoreKey);
+
+  console.log("values", values, descYears);
   this.chart = c3.generate({
     bindto: selector,
     data: {
-      xFormat: '%Y-%m-%d',
+      xFormat: '%m-%d',
       json: [],
       keys: {
         x: "date",
-        value: [ "Average Scores" ]
+        value: values
       },
     },
     axis: {
@@ -76,7 +85,7 @@ function YearChart (day, selector) {
           tick: {
             format: function (x) { 
               // console.log("args", arguments)
-              return moment(x).format('MMM Do, YYYY'); 
+              return moment(x).format('MMM Do'); 
             },
             culling: {
               max: 10
@@ -93,23 +102,35 @@ function YearChart (day, selector) {
 
 YearChart.prototype.loadYear = function(year, delay) {
   var self = this;
-  var ms = delay || 1000;
+  var ms = delay || 0;
   var data = this.years[year].map(function(m){ 
-    return {
-      date: moment(m.attributes._id).format('YYYY-MM-DD'),
-      avgScore: Math.round(parseFloat(m.attributes.avgScore)*10)/10
+    var o = {
+      date: moment(m.attributes._id).format('MM-DD'),
     }
-  })
+    o[scoreKey(year)] = Math.round(parseFloat(m.attributes.avgScore)*10)/10
+    return o;
+  });
+
   setTimeout(function () {
     self.chart.load({
-        xFormat: '%Y-%m-%d',
+        xFormat: '%m-%d',
         json: data,
         keys: {
           x: "date",
-          value: [ "avgScore" ]
+          value: [ scoreKey(year) ]
         }
       })
   }, ms);
+}
+
+YearChart.prototype.unloadYear = function(year, delay) {
+  var self = this;
+  var ms = delay || 0;
+
+  setTimeout(function(){
+    self.chart.unload([scoreKey(year)]);
+  }, ms);
+    
 }
 
 var HomeViews = {
@@ -306,8 +327,14 @@ var HomeViews = {
         self.$('.years-buttons').append(yearView.render().$el);
       });
 
-     // load latest year
-    this.yearViews[0].loadYear.call(this.yearViews[0]);
+      // load last year on start 
+      // TODO: load more years without it looking weird
+
+      [ 0 ].forEach(function(idx){
+        var year = self.yearViews[idx]
+        year.loadYear.call(year);
+      });
+    
     },
 
     render: function() {
@@ -322,6 +349,7 @@ var HomeViews = {
       this.yearNum = opts.yearNum;
       this.dates = opts.dates;
       this.c3 = opts.c3;
+      this.loaded = false;
     },
 
     className: 'year',
@@ -332,12 +360,28 @@ var HomeViews = {
       "click .year-button": "loadYear"
     },
 
-    loadYear: function(e){
+    // TODO: consolidate into one method: toggleYear
+    loadYear: function(e, year){
+      if (this.loaded) {
+        return this.unloadYear(e, year);
+      }
       console.log("LOADING YEAR", arguments, this);
-      $('.year-button').removeClass('selected');
+      var year = year || this.yearNum;
+      
       this.$('.year-button').addClass('selected');
-      this.c3.chart.unload();
-      this.c3.loadYear(this.yearNum);
+      // this.c3.chart.unload();
+      this.c3.loadYear(year);
+      this.loaded = true;
+    },
+
+    unloadYear: function(e, year){
+      if (!this.loaded) {
+        return this.loadYear(e, year);
+      }
+      var year = year || this.yearNum;
+      this.$('.year-button').removeClass('selected');
+      this.c3.unloadYear(year);
+      this.loaded = false;
     },
 
     template: function(attrs){
