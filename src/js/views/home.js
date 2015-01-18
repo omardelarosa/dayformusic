@@ -23,7 +23,7 @@ function makeGauge (avg, selectorOfTarget, label) {
                 ['% score', percent ]
             ],
             type: 'gauge',
-            onclick: function (d, i) { console.log("onclick", d, i); },
+            // onclick: function (d, i) { console.log("onclick", d, i); },
             // onmouseover: function (d, i) { console.log("onmouseover", d, i); },
             // onmouseout: function (d, i) { console.log("onmouseout", d, i); }
         },
@@ -375,7 +375,6 @@ var HomeViews = {
       if (this.loaded) {
         return this.unloadYear(e, year);
       }
-      console.log("LOADING YEAR", arguments, this);
       var year = year || this.yearNum;
       
       this.$('.year-button').addClass('selected');
