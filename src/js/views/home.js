@@ -103,7 +103,7 @@ YearChart.prototype.loadYear = function(year, delay) {
   var ms = delay || 0;
   var data = this.years[year].map(function(m){ 
     var o = {
-      date: moment(m.attributes._id).format('MM-DD'),
+      date: moment(m.attributes._id).tz('America/New_York').format('MM-DD'),
     }
     o[scoreKey(year)] = Math.round(parseFloat(m.attributes.avgScore)*10)/10
     return o;
