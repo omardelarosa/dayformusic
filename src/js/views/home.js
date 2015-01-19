@@ -6,7 +6,7 @@ var $ = require("jquery")
   , d3 = require('d3')
   , c3 = require('c3')
   , _ = require('lodash')
-  , moment = require('moment')
+  , moment = require('moment-timezone')
   , Pikaday = require('pikaday');
 
 Backbone.$ = $;
