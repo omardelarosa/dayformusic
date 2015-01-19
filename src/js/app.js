@@ -24,18 +24,6 @@ function App (opts) {
     day: this.day,
   });
 
-  // TODO: pack this all up into a single query
-  // this.day.fetch()
-  // .done(function(data){
-  //   self.day.trigger('daySet');
-  //   self.day.averages.add()
-  //     .done(function(data) {
-  //       self.setAveragesByYear();
-  //       self.day.trigger('yearsSet');
-  //       console.log("YEARS SET")
-  //     });
-  // })
-
   $.ajax({
     url: '/charts/bundle'
   }).done(function(data){
