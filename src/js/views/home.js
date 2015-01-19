@@ -83,7 +83,7 @@ function YearChart (day, selector) {
           type: 'timeseries',
           tick: {
             format: function (x) { 
-              return moment(x).format('MMM Do'); 
+              return moment.tz(x, "America/New_York").add(5,"hours").format('MMM Do'); 
             },
             culling: {
               max: 10
@@ -103,7 +103,7 @@ YearChart.prototype.loadYear = function(year, delay) {
   var ms = delay || 0;
   var data = this.years[year].map(function(m){ 
     var o = {
-      date: moment(m.attributes._id).tz('America/New_York').format('MM-DD'),
+      date: moment(m.attributes._id).tz('America/New_York').add(5,"hours").format('MM-DD'),
     }
     o[scoreKey(year)] = Math.round(parseFloat(m.attributes.avgScore)*10)/10
     return o;
