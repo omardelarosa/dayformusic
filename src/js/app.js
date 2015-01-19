@@ -27,6 +27,7 @@ function App (opts) {
   $.ajax({
     url: '/charts/bundle'
   }).done(function(data){
+    self.day.hasLoaded = true;
     self.day.add(data["latest"]);
     self.day.trigger('daySet');
     self.day.averages.add(data["averages"]);

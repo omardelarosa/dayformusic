@@ -273,6 +273,31 @@ var HomeViews = {
       return Handlebars.compile(require('../../templates/splash')())(attrs);
     },
 
+    getCaption: function() {
+      if (this.day.hasLoaded && this.day.models.length === 0) {
+        return "had no new reviews";
+      } else if (!this.day.hasLoaded) {
+        return "is loading...";
+      }
+      var avg = this.day.getAverage();
+      var adj = "";
+
+      // if it's today, change to was
+      var dayDiff = Math.abs(this.day.date.diff(moment(), 'days'))
+      var verb = (dayDiff === 0 ? "is" : "was");
+
+      if (avg < 5) {
+        adj = "crummy"
+      } else if (avg >= 5 && avg < 6) {
+        adj = "decent";
+      } else if (avg >= 6 && avg < 7) {
+        adj = "pretty good"
+      } else if (avg >= 7) {
+        adj = "great"
+      }
+      return verb+" a "+adj+" day for music";
+    },
+
     render: function() {
       var avg = this.day ? this.day.getAverage() : "";
       this.$el.html(this.template({
@@ -280,6 +305,7 @@ var HomeViews = {
         scoreAverage: avg
       }));
       this.gauge = makeGauge(avg, '.gauge-big');
+      this.$('.caption').text(this.getCaption());
       return this;
     },
 
@@ -509,15 +535,31 @@ var HomeViews = {
   Header: Backbone.View.extend({
 
     initialize: function(opts) {
-
+      this.day = opts.day;
     },
 
     className: 'header',
 
+    events: {
+      "click .latest-link" : "changeDate"
+    },
+
     template: require('../../templates/partials/_header'),
 
+    changeDate: function(){
+      var d = this.$('.date-field').val();
+      this.day.changeDayTo(d);
+      this.$('.date-field').val("");
+    },
+
     render: function() {
+      var self = this;
       this.$el.html(this.template());
+      this.picker = new Pikaday({
+        field: this.$('.date-field')[0],
+        maxDate: new Date()
+      });
+      this.$('.date-field').on('change', this.changeDate.bind(this) );
       return this;
     },
 

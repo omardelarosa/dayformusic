@@ -148,7 +148,8 @@ a.pure-button-primary {
 .splash-subhead {
   color: white;
   letter-spacing: 0.05em;
-  opacity: 0.8; }
+  opacity: 0.8;
+  font-size: 0.85em; }
 
 /*
  * -- CONTENT STYLES --
@@ -187,6 +188,9 @@ a.pure-button-primary {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 2em 0 1em; }
+
+.drop-down {
+  display: none; }
 
 /* This is a modifier class used when the content-head is inside a ribbon */
 .content-head-ribbon {

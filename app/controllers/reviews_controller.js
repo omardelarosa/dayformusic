@@ -155,7 +155,6 @@ module.exports = {
     db.bind('reviews')
 
     var date = req.query.date || new Date();
-    console.log("req", req.query, date );
 
     getSingleDay(db, date)
       .then(function(docs){

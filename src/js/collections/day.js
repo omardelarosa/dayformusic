@@ -6,6 +6,7 @@ module.exports = Backbone.Collection.extend({
   initialize: function(opts){
     var opts = opts || {};
     this.latest = true;
+    this.hasLoaded = false;
     this.date = opts.date ? moment(opts.date) : moment();
   },
 
@@ -21,7 +22,7 @@ module.exports = Backbone.Collection.extend({
 
   changeDayTo: function(newDate) {
     var self = this;
-    if (!newDate) {
+    if (newDate === "" || !newDate) {
       this.date = moment();
       this.latest = true
       this.fetch()
