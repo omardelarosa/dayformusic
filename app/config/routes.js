@@ -4,6 +4,8 @@ module.exports = function (app) {
 
   app.get('/reviews/latest', controllers.reviews.latest )
 
+  app.get('/reviews/single-day', controllers.reviews.singleDay )
+
   app.get('/reviews/averages', controllers.reviews.averages )
 
   app.get('/reviews/top-artists', controllers.reviews.topArtists )

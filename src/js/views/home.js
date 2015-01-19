@@ -6,7 +6,8 @@ var $ = require("jquery")
   , d3 = require('d3')
   , c3 = require('c3')
   , _ = require('lodash')
-  , moment = require('moment');
+  , moment = require('moment')
+  , Pikaday = require('pikaday');
 
 Backbone.$ = $;
 
@@ -135,16 +136,17 @@ function TopChart (type, collection) {
   var self = this;
   var columns = [[ "name" ]];
   var x = [ "name" ];
+  var artistType = (type === "artists" ? true : false);
   var selector = '.'+type+'-chart';
   var data = collection.toJSON().map(function(input){
-    var output = {}
-    output["scoreAvg"] = Math.round(input.scoreAvg*100)/100;
-    output[input["_id"]] = input.totalReviews;
-    return output;
+    var out = {}
+    out["scoreAvg"] = Math.round(input.scoreAvg*100)/100;
+    out[input["_id"]] = input.totalReviews;
+    return out;
   });
   var values = collection.toJSON().map(function(i){ return i["_id"]; })
-
-  var range = ("type" === "artists" ? { max: 9, min: 5} : {max: 6, max: 8 });
+  var range = ( artistType ? { max: 9, min: 5} : {max: 6, max: 8 });
+  var score_type = ( artistType ? "Received" : "Given");
 
   this.chart = c3.generate({
     bindto: selector,
@@ -170,7 +172,7 @@ function TopChart (type, collection) {
           fit: true,
           centered: true
         },
-        label: "Average Score"
+        label: "Average Score "+score_type
       }
     }
   });
@@ -562,10 +564,14 @@ var HomeViews = {
     render: function() {
       this.$el.html(this.template({
         title: this.model.get('album'),
-        artist: this.model.get('artist')
+        artist: this.model.get('artist'),
+        author: this.model.get('author')
       }));
       this.$el.addClass("pure-u-1-"+this.total);
-      this.$('.album-meta-cover').append("<img class='pure-u-1-1 cover'src='"+this.model.get('cover')+"'/>");
+      var $link = $('<a href="http://www.pitchfork.com'+this.model.get('url')+'" target="_blank"></>');
+      var $img = $("<img class='pure-u-1-1 cover'src='"+this.model.get('cover')+"'/>");
+      $link.append($img);
+      this.$('.album-meta-cover').append($link);
       
       return this;
     }

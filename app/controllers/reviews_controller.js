@@ -62,6 +62,20 @@ function getLatest (db) {
   })
 }
 
+function getSingleDay (db, date) {
+  var d = new Date(moment(date).startOf('day'));
+  return Q.Promise(function(resolve, reject, notify){
+    db.reviews
+      .find({
+        "_date": d
+      })
+      .toArray(function (err, docs) {
+        if (err) { return reject(err); }
+        resolve(docs)
+      })
+  })
+}
+
 function getTopArtists (db) {
   return Q.Promise(function(resolve, reject, notify){
     db.reviews
@@ -128,6 +142,22 @@ module.exports = {
     db.bind('reviews')
 
     getToday(db)
+      .then(function(docs){
+        res.send(docs)
+      })
+      .catch(handleError.bind(this) )
+      .then(closeDb.bind(this, db) );
+
+  },
+
+  singleDay: function (req, res, next) {
+
+    db.bind('reviews')
+
+    var date = req.query.date || new Date();
+    console.log("req", req.query, date );
+
+    getSingleDay(db, date)
       .then(function(docs){
         res.send(docs)
       })

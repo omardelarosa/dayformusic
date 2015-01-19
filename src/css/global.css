@@ -173,6 +173,9 @@ a.pure-button-primary {
   padding: 5px;
   margin: 2px; }
 
+.album-meta-review {
+  font-size: 0.7em; }
+
 .selected {
   background-color: #ffffff;
   color: #1f8dd6;
