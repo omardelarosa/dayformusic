@@ -212,6 +212,9 @@ a.pure-button-primary {
 .footer {
   background: #111; }
 
+.artists-list, .artists-buttons {
+  list-style-type: none; }
+
 /*
  * -- TABLET (AND UP) MEDIA QUERIES --
  * On tablets and other medium-sized devices, we want to customize some

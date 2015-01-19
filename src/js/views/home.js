@@ -314,12 +314,27 @@ var HomeViews = {
   Form: Backbone.View.extend({
 
     initialize: function(opts) {
-
+      this.artists_fields = [];
     },
 
     id: 'subscribe',
 
     className: 'ribbon l-box-lrg pure-g',
+
+    events: {
+      "click .artists-add-button": "addArtist",
+    },
+
+    addArtist: function (e) {
+
+      console.log("ADDING ARTIST", e);
+      var artist_field = new HomeViews.ArtistField({
+        form_view: this
+      })
+      this.artists_fields.push(artist_field.render());
+      this.$('.artists-list').append(artist_field.$el);
+      return false;
+    },
 
     subscribe: function  (e) {
 
@@ -330,10 +345,12 @@ var HomeViews = {
           dataType: 'json',
           data: attrs, 
           success: function (res, statusText, req) {
-            console.log("res", res)
-            if (res[0] && res[0].message) {
-              if (res[0].message === "full") {
+            if (res[0] && res[0].status === 'error') {
+              var type = res[0].type;
+              if (type === "full") {
                 handleFullSubscriberList(attrs)
+              } else {
+                alert(res[0].message);
               }
             }
           }
@@ -351,11 +368,15 @@ var HomeViews = {
       var $score_threshold_input = $form.find('#score_threshold')
       var $first_name = $form.find('#first_name')
       var $last_name = $form.find('#last_name')
+
+      var artists = this.artists;
+
       var attrs = {
         "email": $email_input.val(),
         "score_threshold": $score_threshold_input.val(),
         "first_name": $first_name.val(),
-        "last_name": $last_name.val()
+        "last_name": $last_name.val(),
+        "artists": artists,
       }
       createSubscriber(attrs)
       $email_input.val("")
@@ -368,9 +389,50 @@ var HomeViews = {
 
     render: function() {
       this.$el.html(this.template());
-      this.$('.subscribe-form').bind('submit', this.subscribe)
+      this.$('.subscribe-form').bind('submit', this.subscribe.bind(this) );
+      this.$('.artists-add-button').unbind('submit');
+
+      // remove any previous fields
+      if (this.artists_fields && this.artists_fields.forEach) {
+        this.artists_fields.forEach(function(f){ f.remove(); })
+      }
+      // reset artists fields
+      this.artists_fields = [];
+      // create a new field view
+      var artist_field = new HomeViews.ArtistField({
+        form_view: this
+      })
+      this.artists_fields.push(artist_field.render());
+      this.$('.artists-list').append(artist_field.$el);
       return this;
     },
+
+  }),
+
+  ArtistField: Backbone.View.extend({
+
+    initialize: function(opts) {
+      this.form_view = opts.form_view;
+      console.log("HAS AUTOCOMPLETE", $, $.autocomplete)
+    },
+
+    events: {
+      "change input": "updateList"
+    },
+
+    updateList: function(e) {
+      console.log("UPDATING LIST", e);
+    },
+
+    tagName: 'li',
+
+    render: function() {
+      var $input = $('<input>');
+        $input.attr('type', 'text');
+        $input.attr('placeholder', 'Artist Name Goes Here');
+        this.$el.append($input);
+      return this;
+    }
 
   }),
 
@@ -547,19 +609,22 @@ var HomeViews = {
     template: require('../../templates/partials/_header'),
 
     changeDate: function(){
-      var d = this.$('.date-field').val();
+      var d = this.$date_field.val();
       this.day.changeDayTo(d);
-      this.$('.date-field').val("");
+      this.$date_field.attr('placeholder', moment(d === "" ? undefined : d).format('YYYY-MM-DD'));
+      this.$date_field.val("");
     },
 
     render: function() {
       var self = this;
       this.$el.html(this.template());
+      this.$date_field = this.$('.date-field');
       this.picker = new Pikaday({
-        field: this.$('.date-field')[0],
+        field: this.$date_field[0],
         maxDate: new Date()
       });
-      this.$('.date-field').on('change', this.changeDate.bind(this) );
+      this.$date_field.attr('placeholder', moment().format('YYYY-MM-DD'));
+      this.$date_field.on('change', this.changeDate.bind(this) );
       return this;
     },
 

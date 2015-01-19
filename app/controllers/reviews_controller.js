@@ -37,6 +37,27 @@ function getAverages (db)  {
   });
 }
 
+function getArtistsList (db)  {
+  return Q.Promise(function(resolve, reject, notify) {
+    db.reviews.aggregate(
+        [ 
+          { 
+            $group: { 
+              _id: "$artist"
+            }
+          },
+          { $sort: { _id: 1 } },
+        ],
+        function (err, docs) {
+          if (err) { 
+            return reject(err);
+          }
+          resolve(docs)
+        }
+      )
+  });
+}
+
 function getToday (db) {
   return Q.Promise(function(resolve, reject, notify){
     db.reviews
@@ -136,6 +157,18 @@ function getTopReviewers (db) {
 }
 
 module.exports = {
+
+  artistsList: function (req, res, next) {
+    db.bind('reviews')
+
+    getArtistsList(db)
+      .then(function(docs){
+        var formattedList = docs.map(function(d){ return d._id});
+        res.send(formattedList);
+      })
+      .catch(handleError.bind(this) )
+      .then(closeDb.bind(this, db) );
+  },
 
   today: function (req, res, next ) {
 

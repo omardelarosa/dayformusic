@@ -37,6 +37,8 @@ function App (opts) {
     self.day.trigger('artistsSet');
     self.day.reviewers.add(data["reviewers"]);
     self.day.trigger('reviewersSet');
+    // lazy load list, cuz it's big
+    self.day.artistsList = $.getJSON('/reviews/artists-list');
   });
 
   this.main_view.render();

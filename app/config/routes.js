@@ -8,6 +8,8 @@ module.exports = function (app) {
 
   app.get('/reviews/averages', controllers.reviews.averages )
 
+  app.get('/reviews/artists-list', controllers.reviews.artistsList )
+
   app.get('/reviews/top-artists', controllers.reviews.topArtists )
 
   app.get('/reviews/top-reviewers', controllers.reviews.topReviewers )
