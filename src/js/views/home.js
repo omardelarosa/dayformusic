@@ -430,12 +430,10 @@ var HomeViews = {
     },
 
     updateList: function(suggestion) {
-      console.log("UPDATING LIST", suggestion)
       this.artist = suggestion.value;
     },
 
     handleChange: function(e) {
-      console.log("CHANGE", e);
       var artistName = $(e.target).val();
       this.artist = artistName;
     },
