@@ -425,8 +425,19 @@ var HomeViews = {
       this.artist = null;
     },
 
+    events: {
+      "change input" : "handleChange"
+    },
+
     updateList: function(suggestion) {
+      console.log("UPDATING LIST", suggestion)
       this.artist = suggestion.value;
+    },
+
+    handleChange: function(e) {
+      console.log("CHANGE", e);
+      var artistName = $(e.target).val();
+      this.artist = artistName;
     },
 
     tagName: 'li',
@@ -440,7 +451,7 @@ var HomeViews = {
 
       $input.autocomplete({
         lookup: this.form_view.day.artistsList.map(function(dataItem) {
-          return { value: dataItem, data: dataItem }
+          return { value: dataItem || "", data: dataItem || "" }
         }),
         onSelect: this.updateList.bind(this)
       });
