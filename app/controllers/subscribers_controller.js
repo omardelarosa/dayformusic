@@ -12,12 +12,15 @@ module.exports = {
     var score_threshold = req.body.score_threshold || 0;
     var first_name = req.body.first_name || null;
     var last_name = req.body.last_name || null;
-
+    var artists = req.body["artists[]"] || [];
+    // fix for empty / false artists
+    var cleanedArtists = artists.filter(function(a){ return a !== "" || !!a; })
     var subscriber = {
       email: email,
       score_threshold: parseFloat(score_threshold),
       first_name: first_name,
-      last_name: last_name
+      last_name: last_name,
+      artists: cleanedArtists
     }
 
     if (!email || !score_threshold) {

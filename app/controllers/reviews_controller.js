@@ -276,6 +276,13 @@ module.exports = {
           })
           .catch(handleError.bind(this) )
       })
+      .then(function(docs){
+        return getArtistsList(db)
+          .then(function(docs){
+            bundle["artistsList"] = docs;
+          })
+          .catch(handleError.bind(this));
+      })
       .catch(handleError.bind(this))
       .then(function(){
         res.send(bundle);

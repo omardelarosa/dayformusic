@@ -7,9 +7,11 @@ var $ = require("jquery")
   , c3 = require('c3')
   , _ = require('lodash')
   , moment = require('moment-timezone')
-  , Pikaday = require('pikaday');
+  , Pikaday = require('pikaday')
+  , autocomplete = require('../plugins/jquery.autocomplete.js');
 
 Backbone.$ = $;
+$.fn.autocomplete = autocomplete($);
 
 function scoreKey(year){
   return year+" Average Score";
@@ -315,6 +317,7 @@ var HomeViews = {
 
     initialize: function(opts) {
       this.artists_fields = [];
+      this.day = opts.day;
     },
 
     id: 'subscribe',
@@ -326,14 +329,23 @@ var HomeViews = {
     },
 
     addArtist: function (e) {
-
-      console.log("ADDING ARTIST", e);
       var artist_field = new HomeViews.ArtistField({
         form_view: this
       })
       this.artists_fields.push(artist_field.render());
       this.$('.artists-list').append(artist_field.$el);
       return false;
+    },
+
+    clearArtists: function() {
+      this.artists_fields.forEach(function(f){
+        f.artist = undefined;
+        f.$el.val("");
+      });
+    },
+
+    getArtistsList: function () {
+      return this.artists_fields.map(function(f){ return f.artist; });
     },
 
     subscribe: function  (e) {
@@ -369,7 +381,7 @@ var HomeViews = {
       var $first_name = $form.find('#first_name')
       var $last_name = $form.find('#last_name')
 
-      var artists = this.artists;
+      var artists = this.getArtistsList();
 
       var attrs = {
         "email": $email_input.val(),
@@ -388,6 +400,7 @@ var HomeViews = {
     template: require('../../templates/form'),
 
     render: function() {
+      var self = this;
       this.$el.html(this.template());
       this.$('.subscribe-form').bind('submit', this.subscribe.bind(this) );
       this.$('.artists-add-button').unbind('submit');
@@ -399,11 +412,7 @@ var HomeViews = {
       // reset artists fields
       this.artists_fields = [];
       // create a new field view
-      var artist_field = new HomeViews.ArtistField({
-        form_view: this
-      })
-      this.artists_fields.push(artist_field.render());
-      this.$('.artists-list').append(artist_field.$el);
+      this.listenTo(this.day, 'artistsListSet', this.addArtist );
       return this;
     },
 
@@ -413,24 +422,28 @@ var HomeViews = {
 
     initialize: function(opts) {
       this.form_view = opts.form_view;
-      console.log("HAS AUTOCOMPLETE", $, $.autocomplete)
+      this.artist = null;
     },
 
-    events: {
-      "change input": "updateList"
-    },
-
-    updateList: function(e) {
-      console.log("UPDATING LIST", e);
+    updateList: function(suggestion) {
+      this.artist = suggestion.value;
     },
 
     tagName: 'li',
 
     render: function() {
       var $input = $('<input>');
-        $input.attr('type', 'text');
-        $input.attr('placeholder', 'Artist Name Goes Here');
-        this.$el.append($input);
+      $input.attr('type', 'text');
+      $input.attr('placeholder', 'Choose an artist');
+      $input.addClass('autocomplete-input');
+      this.$el.append($input);
+
+      $input.autocomplete({
+        lookup: this.form_view.day.artistsList.map(function(dataItem) {
+          return { value: dataItem, data: dataItem }
+        }),
+        onSelect: this.updateList.bind(this)
+      });
       return this;
     }
 
