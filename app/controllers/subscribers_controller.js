@@ -14,6 +14,10 @@ module.exports = {
     var last_name = req.body.last_name || null;
     var artists = req.body["artists[]"] || [];
     // fix for empty / false artists
+    console.log("ARTISTS", artists, typeof artists);
+    if (typeof artists === 'string') {
+      artists = [ artists ];
+    }
     var cleanedArtists = artists.filter(function(a){ return a !== "" || !!a; })
     var subscriber = {
       email: email,
@@ -55,6 +59,25 @@ module.exports = {
       })
 
     
-  }
+  },
+
+  unsubscribe: function (req, res, next) {
+    var token = req.query.t;
+    
+    db.bind('subscribers')
+
+    db.subscribers.findById(token, function(err, result){
+        if (err) { res.send(500); return; }
+        if (result) {
+          var email = result.email;
+          db.subscribers.removeById(token, function(err, result){
+            if (err) { res.send(500); return; }
+            res.send("You have successfully unsubscribed "+email+" from the mailing list!");
+          })
+        } else {
+          res.send("Invalid Token!");
+        }
+      })
+  },
 
 }

@@ -18,4 +18,6 @@ module.exports = function (app) {
 
   app.post('/subscribers', controllers.subscribers.create )
 
+  app.get('/unsubscribe', controllers.subscribers.unsubscribe )
+
 }
