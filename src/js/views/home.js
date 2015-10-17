@@ -69,7 +69,6 @@ function YearChart (day, selector) {
   var descYears = day.descendingYears;
   this.descYears = descYears;
   var values = descYears.map(scoreKey);
-  debugger
   this.chart = c3.generate({
     bindto: selector,
     data: {
