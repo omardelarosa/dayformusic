@@ -8,7 +8,7 @@
   "description": "boilerplate code for making a client side app whose assets are precompiled using gulp + browserify, etc",
   "main": "index.js",
   "engines": {
-    "node": "0.12.7"
+    "node": "0.10.40"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
