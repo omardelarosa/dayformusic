@@ -7,7 +7,9 @@ var moment = require('moment')
 
 function handleError(err, res) {
   console.log("ERROR", err);
-  res.send(500)
+  console.log(err.stack);
+  
+  if (res && res.send) res.send(500);
 }
 
 function closeDb(db) {
@@ -31,9 +33,9 @@ function getAverages (db)  {
           if (err) { 
             return reject(err);
           }
-          resolve(docs)
+          resolve(docs);
         }
-      )
+      );
   });
 }
 
@@ -52,9 +54,9 @@ function getArtistsList (db)  {
           if (err) { 
             return reject(err);
           }
-          resolve(docs)
+          resolve(docs);
         }
-      )
+      );
   });
 }
 
@@ -66,9 +68,9 @@ function getToday (db) {
       })
       .toArray(function (err, docs) {
         if (err) { return reject(err); }
-        resolve(docs)
-      })
-  })
+        resolve(docs);
+      });
+  });
 }
 
 function getLatest (db) {
@@ -78,9 +80,9 @@ function getLatest (db) {
       .limit(5)
       .toArray(function (err, docs) {
         if (err) { return reject(err); }
-        resolve(docs)
-      })
-  })
+        resolve(docs);
+      });
+  });
 }
 
 function getSingleDay (db, date) {
@@ -92,9 +94,9 @@ function getSingleDay (db, date) {
       })
       .toArray(function (err, docs) {
         if (err) { return reject(err); }
-        resolve(docs)
-      })
-  })
+        resolve(docs);
+      });
+  });
 }
 
 function getTopArtists (db) {
@@ -123,10 +125,10 @@ function getTopArtists (db) {
         ],
         function (err, docs) {
           if (err) { return reject(err); }
-          resolve(docs)
+          resolve(docs);
         }
-      )
-  })
+      );
+  });
 }
 
 function getTopReviewers (db) {
@@ -150,20 +152,20 @@ function getTopReviewers (db) {
         ],
         function (err, docs) {
           if (err) { return reject(err); }
-          resolve(docs)
+          resolve(docs);
         }
-      )
-  })
+      );
+  });
 }
 
 module.exports = {
 
   artistsList: function (req, res, next) {
-    db.bind('reviews')
+    db.bind('reviews');
 
     getArtistsList(db)
       .then(function(docs){
-        var formattedList = docs.map(function(d){ return d._id});
+        var formattedList = docs.map(function(d){ return d._id; });
         res.send(formattedList);
       })
       .catch(handleError.bind(this) )
@@ -172,11 +174,11 @@ module.exports = {
 
   today: function (req, res, next ) {
 
-    db.bind('reviews')
+    db.bind('reviews');
 
     getToday(db)
       .then(function(docs){
-        res.send(docs)
+        res.send(docs);
       })
       .catch(handleError.bind(this) )
       .then(closeDb.bind(this, db) );
@@ -185,13 +187,13 @@ module.exports = {
 
   singleDay: function (req, res, next) {
 
-    db.bind('reviews')
+    db.bind('reviews');
 
     var date = req.query.date || new Date();
 
     getSingleDay(db, date)
       .then(function(docs){
-        res.send(docs)
+        res.send(docs);
       })
       .catch(handleError.bind(this) )
       .then(closeDb.bind(this, db) );
@@ -200,11 +202,11 @@ module.exports = {
 
   latest: function (req, res, next) {
 
-    db.bind('reviews')
+    db.bind('reviews');
 
     getLatest(db)
       .then(function(docs){
-        res.send(docs)
+        res.send(docs);
       })
       .catch(handleError.bind(this) )
       .then(closeDb.bind(this, db) );
@@ -212,33 +214,33 @@ module.exports = {
   },
 
   topArtists: function(req, res, next) {
-    db.bind('reviews')
+    db.bind('reviews');
 
     getTopArtists(db)
       .then(function(docs){
-        res.send(docs)
+        res.send(docs);
       })
       .catch(handleError.bind(this) )
       .then(closeDb.bind(this, db) );
   },
 
   topReviewers: function(req, res, next) {
-    db.bind('reviews')
+    db.bind('reviews');
 
     getTopReviewers(db)
       .then(function(docs){
-        res.send(docs)
+        res.send(docs);
       })
       .catch(handleError.bind(this) )
       .then(closeDb.bind(this, db) );
   },
 
   averages: function (req, res, next) {
-    db.bind('reviews')
+    db.bind('reviews');
 
     getAverages(db)
       .then(function(docs){
-        res.send(docs)
+        res.send(docs);
       })
       .catch(handleError.bind(this) )
       .then(closeDb.bind(this, db) );
@@ -260,21 +262,21 @@ module.exports = {
           .then(function(docs){
             bundle["averages"] = docs;
           })
-          .catch(handleError.bind(this) )
+          .catch(handleError.bind(this) );
       })
       .then(function(docs){
         return getTopArtists(db)
           .then(function(docs){
             bundle["artists"] = docs;
           })
-          .catch(handleError.bind(this) )
+          .catch(handleError.bind(this) );
       })
       .then(function(docs){
         return getTopReviewers(db)
           .then(function(docs){
             bundle["reviewers"] = docs;
           })
-          .catch(handleError.bind(this) )
+          .catch(handleError.bind(this) );
       })
       .then(function(docs){
         return getArtistsList(db)
@@ -286,9 +288,9 @@ module.exports = {
       .catch(handleError.bind(this))
       .then(function(){
         res.send(bundle);
-        closeDb.bind(this, db)
+        closeDb.bind(this, db);
       });
 
   }
 
-}
+};

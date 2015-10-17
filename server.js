@@ -13,10 +13,10 @@ module.exports.start = function(done){
   var app = express();
 
   // parse application/x-www-form-urlencoded
-  app.use(bodyParser.urlencoded({ extended: false }))
+  app.use(bodyParser.urlencoded({ extended: false }));
 
   // parse application/json
-  app.use(bodyParser.json())
+  app.use(bodyParser.json());
 
   app.use(express.static(__dirname + '/public'));
   app.use(logfmt.requestLogger());
@@ -43,7 +43,7 @@ module.exports.start = function(done){
     }
   });
 
-}
+};
 
 
 // Run the server if someone runs this file directly

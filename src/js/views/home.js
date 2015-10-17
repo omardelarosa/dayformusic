@@ -69,7 +69,7 @@ function YearChart (day, selector) {
   var descYears = day.descendingYears;
   this.descYears = descYears;
   var values = descYears.map(scoreKey);
-
+  debugger
   this.chart = c3.generate({
     bindto: selector,
     data: {
@@ -221,7 +221,6 @@ var HomeViews = {
   ContentWrapper: Backbone.View.extend({
 
     initialize: function(opts){
-      // console.log("")
       this.day = opts.day;
       this.listenTo(this.day, 'daySet', this.render.bind(this) );
     },

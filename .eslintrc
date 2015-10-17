@@ -1,0 +1,47 @@
+{
+    "rules": {
+        "linebreak-style": [
+            2,
+            "unix"
+        ],
+        "semi": [
+            2,
+            "always"
+        ],
+        "no-trailing-spaces": [0],
+        "no-unused-vars": [0],
+        "no-undef": [0],
+        "comma-dangle": [0],
+        "no-redeclare": [0],
+        "no-console": [0],
+        "no-extra-boolean-cast": [0]
+    },
+    "env": {
+        "es6": true,
+        "node": true,
+        "browser": true,
+        "mocha": true,
+        "commonjs": true,
+        "jquery": true
+    },
+    "extends": "eslint:recommended",
+    "ecmaFeatures": {
+        "modules": true,
+        "jsx": true,
+        "experimentalObjectRestSpread": true
+    },
+    "globals": {
+      "_": true,
+      "React": true,
+      "flux": true,
+      "pathFor": true,
+      "path": true,
+      "__segments": true,
+      "jsdom": true,
+      "assert": true,
+      "expect": true
+    },
+    "plugins": [
+        "react"
+    ]
+}

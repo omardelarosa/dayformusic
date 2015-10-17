@@ -5,3 +5,4 @@ public/style.css
 public/template.js
 tmp/
 .DS_Store
+*.log
