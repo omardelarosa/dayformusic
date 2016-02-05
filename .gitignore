@@ -3,6 +3,9 @@ public/bundle.min.js
 public/bundle.min.js.map
 public/style.css
 public/template.js
+public/dataBundle.json
 tmp/
 .DS_Store
 *.log
+*.swp
+*.swo

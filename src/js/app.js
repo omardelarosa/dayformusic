@@ -12,8 +12,8 @@ Backbone.$ = $;
 
 function App (opts) {
 
-  var self = this;
-
+  var data = window.__dataBundle;
+  debugger
   // initialize
   this.day = opts.day;
   this.day.averages = new Averages();
@@ -24,25 +24,22 @@ function App (opts) {
     day: this.day,
   });
 
-  $.ajax({
-    url: '/charts/bundle'
-  }).done(function(data){
-    self.day.hasLoaded = true;
-    self.day.add(data["latest"]);
-    self.day.trigger('daySet');
-    self.day.averages.add(data["averages"]);
-    self.setAveragesByYear();
-    self.day.trigger('yearsSet');
-    self.day.artists.add(data["artists"]);
-    self.day.trigger('artistsSet');
-    self.day.reviewers.add(data["reviewers"]);
-    self.day.trigger('reviewersSet');
-    // note, this is just a normal array
-    self.day.artistsList = data["artistsList"].map(function(e){ return e._id; });
-    self.day.trigger('artistsListSet');
-  });
-
   this.main_view.render();
+  
+  // preloaded object, generated nightly
+  this.day.hasLoaded = true;
+  this.day.add(data["latest"]);
+  this.day.trigger('daySet');
+  this.day.averages.add(data["averages"]);
+  this.setAveragesByYear();
+  this.day.trigger('yearsSet');
+  this.day.artists.add(data["artists"]);
+  this.day.trigger('artistsSet');
+  this.day.reviewers.add(data["reviewers"]);
+  this.day.trigger('reviewersSet');
+  // note, this is just a normal array
+  this.day.artistsList = data["artistsList"].map(function(e){ return e._id; });
+  this.day.trigger('artistsListSet');
 
 }
 

@@ -158,6 +158,49 @@ function getTopReviewers (db) {
   });
 }
 
+function getBundle (db) {
+  var bundle = {};
+  return Q.Promise(function(resolve, reject, notify) {
+     getLatest(db)
+      .then(function(docs){
+        bundle["latest"] = docs;
+      })
+      .catch(handleError.bind(this) )
+      .then(function(docs){
+        return getAverages(db)
+          .then(function(docs){
+            bundle["averages"] = docs;
+          })
+          .catch(handleError.bind(this) );
+      })
+      .then(function(docs){
+        return getTopArtists(db)
+          .then(function(docs){
+            bundle["artists"] = docs;
+          })
+          .catch(handleError.bind(this) );
+      })
+      .then(function(docs){
+        return getTopReviewers(db)
+          .then(function(docs){
+            bundle["reviewers"] = docs;
+          })
+          .catch(handleError.bind(this) );
+      })
+      .then(function(docs){
+        return getArtistsList(db)
+          .then(function(docs){
+            bundle["artistsList"] = docs;
+          })
+          .catch(handleError.bind(this));
+      })
+      .catch(handleError.bind(this))
+      .then(function(){
+        resolve(bundle);
+      }); 
+  });
+}
+
 module.exports = {
 
   artistsList: function (req, res, next) {
@@ -252,45 +295,17 @@ module.exports = {
 
     db.bind('reviews');
 
-    getLatest(db)
-      .then(function(docs){
-        bundle["latest"] = docs;
-      })
-      .catch(handleError.bind(this) )
-      .then(function(docs){
-        return getAverages(db)
-          .then(function(docs){
-            bundle["averages"] = docs;
-          })
-          .catch(handleError.bind(this) );
-      })
-      .then(function(docs){
-        return getTopArtists(db)
-          .then(function(docs){
-            bundle["artists"] = docs;
-          })
-          .catch(handleError.bind(this) );
-      })
-      .then(function(docs){
-        return getTopReviewers(db)
-          .then(function(docs){
-            bundle["reviewers"] = docs;
-          })
-          .catch(handleError.bind(this) );
-      })
-      .then(function(docs){
-        return getArtistsList(db)
-          .then(function(docs){
-            bundle["artistsList"] = docs;
-          })
-          .catch(handleError.bind(this));
-      })
+    getBundle(db)
       .catch(handleError.bind(this))
-      .then(function(){
+      .then(function(bundle){
         res.send(bundle);
         closeDb.bind(this, db);
       });
+  },
 
+  __getDataBundlePromise: function () {
+    db.bind('reviews');
+    return getBundle(db);
   }
 
 };
