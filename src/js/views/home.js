@@ -105,8 +105,8 @@ YearChart.prototype.loadYear = function(year, delay) {
   var data = this.years[year].map(function(m){ 
     var o = {
       date: moment(m.attributes._id).tz('America/New_York').add(5,"hours").format('MM-DD'),
-    }
-    o[scoreKey(year)] = Math.round(parseFloat(m.attributes.avgScore)*10)/10
+    };
+    o[scoreKey(year)] = Math.round(parseFloat(m.attributes.avgScore)*10)/10;
     return o;
   });
 
@@ -118,7 +118,7 @@ YearChart.prototype.loadYear = function(year, delay) {
           x: "date",
           value: [ scoreKey(year) ]
         }
-      })
+      });
   }, ms);
 }
 
@@ -146,7 +146,7 @@ function TopChart (type, collection) {
     return out;
   });
   var values = collection.toJSON().map(function(i){ return i["_id"]; })
-  var range = ( artistType ? { max: 9, min: 5} : {max: 6, max: 8 });
+  var range = ( artistType ? { max: 9, min: 5} : {mix: 6, max: 8 });
   var score_type = ( artistType ? "Received" : "Given");
 
   this.chart = c3.generate({
@@ -191,7 +191,6 @@ var HomeViews = {
     el: function() { return $('#main-container') },
 
     render: function() {
-
       this.views = {
         header: new HomeViews.Header({day: this.day}),
         contentWrapper: new HomeViews.ContentWrapper({day: this.day}),
@@ -291,9 +290,9 @@ var HomeViews = {
       } else if (avg >= 5 && avg < 6) {
         adj = "decent";
       } else if (avg >= 6 && avg < 7) {
-        adj = "pretty good"
+        adj = "pretty good";
       } else if (avg >= 7) {
-        adj = "great"
+        adj = "great";
       }
       return verb+" a "+adj+" day for music";
     },
